@@ -5,7 +5,7 @@ KeyTree is a Bitcoin HDWallet command line tool. To build simply type Make in th
 
 #### How to use:
 
-Input parameters can be in hex or base58. Examples below.
+Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples below.
 
 ###### Given Seed and Chain will print Child Extended Keys:
     $./kt -seed "correct horse battery staple" -chain "m/0'/0"
