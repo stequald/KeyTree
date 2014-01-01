@@ -22,15 +22,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#include "keytree.h"
 #include <sstream>
 #include <regex>
 #include <cassert>
+#include "keytree.h"
 #include "hdkeys.h"
 #include "Base58Check.h"
 
-KeyTree::KeyTree(const std::string seed, const std::string chainStr) {
-    uchar_vector s(seed);
+
+
+KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
+    uchar_vector s;
+
+    //*
+    if (seedStringFormat == StringUtils::StringFormat::ascii) {
+        s= uchar_vector(StringUtils::string_to_hex(seed));
+        
+    } else if (seedStringFormat == StringUtils::StringFormat::hex) {
+        if (! StringUtils::isHex(seed))
+            throw std::runtime_error("Invalid hex string \"" + seed + "\"");
+
+        std::string tmp = seed;
+        std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
+        s = uchar_vector(tmp);
+        
+    } else throw std::runtime_error("Invalid seed string format.");
+     //*/
+    
+    //s = uchar_vector(seed);
+
+    
     Coin::HDSeed hdSeed(s);
     bytes_t k = hdSeed.getMasterKey();
     bytes_t c = hdSeed.getMasterChainCode();
@@ -49,7 +70,7 @@ KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t 
     uchar_vector extendedKey;
     if (isBase58CheckValid(extKey))
         extendedKey = fromBase58ExtKey(extKey);
-    else if (extKey.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos)
+    else if (StringUtils::isHex(extKey))
         extendedKey = uchar_vector(extKey);
     else
         throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
@@ -171,15 +192,23 @@ uchar_vector KeyTree::fromBase58ExtKey(const std::string extKey) {
     return uchar_vector(VERSION_BYTE+fillKey.getHex()); //append VERSION_BYTE to begining
 }
 
+uchar_vector KeyTree::fromBase58(const std::string str) {
+    static unsigned int dummy = 0;
+    uchar_vector fillKey;
+    fromBase58Check(str, fillKey, dummy);
+    return uchar_vector(fillKey.getHex());
+}
+
 std::vector<uint32_t> KeyTree::parseChainString(const std::string chainStr, bool isPrivate) {
     std::vector<uint32_t> chain;
     
-    const std::string s = KeyTree::split(chainStr)[0]; //trim trailing whitespaces
+    const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
     
-    std::vector<std::string> splitChain = KeyTree::split(s, '/');
+    std::vector<std::string> splitChain = StringUtils::split(s, '/');
 
-    //assert(splitChain[0] == "m" || splitChain[0] == "M");
-    assert(splitChain[0] == "m");
+    //assert(splitChain[0] == "m");
+    if (splitChain[0] != "m")
+        throw std::runtime_error("Invalid Chain string.");
     
     if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
     
@@ -219,27 +248,6 @@ std::string KeyTree::iToString(uint32_t i) {
     if (KeyTree::isPrime(i)) { ss << "'"; }
     return ss.str();
 }
-    
-std::vector<std::string> KeyTree::split(std::string text, char seperator) { //equivalent to python text.split(seperator)
-    size_t pos = text.find(seperator);
-    size_t initialPos = 0;
-    std::vector<std::string> rtn;
-    while (pos != std::string::npos)
-    {
-        rtn.push_back(text.substr(initialPos, pos - initialPos));
-        initialPos = pos + 1;
-        pos = text.find(seperator, initialPos);
-    }
-    rtn.push_back(text.substr(initialPos, std::min((int)pos, (int) text.size()) - initialPos));
-    return rtn;
-}
-
-
-
-
-
-
-
 
 
 std::pair<std::string,std::string> KeyTree::generatePrivateKey(const Coin::HDKeychain& keyChain, uint32_t i) {
@@ -428,3 +436,4 @@ std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD_Prime(std::vect
     
     return std::pair<uchar_vector,uchar_vector>(k, chain);
 }
+

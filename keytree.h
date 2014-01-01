@@ -26,10 +26,12 @@
 #define KEYTREE_KEYTREE_H
 
 #include <iostream>
+#include <vector>
 #include "hdkeys.h"
 #include "logger.h"
 #include "Base58Check.h"
-#include <vector>
+#include "stringutils.h"
+
 
 typedef struct {
     std::string chain;
@@ -42,7 +44,7 @@ typedef struct {
 
 class KeyTree {
 public:
-    KeyTree(const std::string seed, const std::string chainStr);
+    KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat);
     KeyTree(const std::string extKey, const std::string chainStr, uint32_t i_min, uint32_t i_max);
     KeyNode getNextInChain();
     KeyNode getCurrentInChain();
@@ -53,12 +55,11 @@ public:
 private:
     bool isPrivate();
     static uchar_vector fromBase58ExtKey(const std::string extKey);
-    static std::vector<std::string> split(std::string text, char seperator = ' ');
+    uchar_vector fromBase58(const std::string str);
     static std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivate = true);
     static inline uint32_t toPrime(uint32_t i) { return 0x80000000 | i; }
     static inline bool isPrime(uint32_t i) { return 0x80000000 & i; }
     static std::string iToString(uint32_t i);
-
     
     
     static std::pair<std::string,std::string> generateAddress(const Coin::HDKeychain& keyChain, uint32_t i);

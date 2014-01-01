@@ -33,40 +33,38 @@ using namespace std;
 static bool IS_DEBUG = false;
 static const std::string HELP = "help";
 
+static const std::string SEED_FORMAT = "seed_format";
+
 static const std::string SEED = "seed";
+static const std::string SEED_HEX = "seed.hex";
+
 static const std::string EXTENDEDKEY = "extkey";
 static const std::string CHAIN = "chain";
 static const std::string I_MIN = "imin";
 static const std::string I_MAX = "imax";
+
 static const std::string SEED_SHORT = "s";
+static const std::string SEED_SHORT_HEX_SHORT = "s.h";
+static const std::string SEED_HEX_SHORT = "seed.h";
+static const std::string SEED_SHORT_HEX = "s.hex";
+
 static const std::string EXTENDEDKEY_SHORT = "ek";
 static const std::string CHAIN_SHORT = "c";
 static const std::string I_MIN_SHORT = "min";
 static const std::string I_MAX_SHORT = "max";
 
-static const std::string appName = "./kt";
-static const std::string exampleArg1 = " -seed 000102030405060708090a0b0c0d0e0f -chain \"m/0'/0\"";
-static const std::string exampleArg2 = " -s 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
-static const std::string exampleArg3 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -imin 0 -imax 3";
-static const std::string exampleArg4 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -min 0 -max 3";
+static const std::string cmdName = "./kt";
+static const std::string exampleArg1 = " -seed \"correct horse battery staple\" -chain \"m/0'/0\"";
+static const std::string exampleArg2 = " -seed.hex 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
+static const std::string exampleArg3 = " -s.hex 000102030405060708090a0b0c0d0e0f -chain \"m/0'/0\"";
+static const std::string exampleArg4 = " -s.h 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
+static const std::string exampleArg5 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -c \"m/0'/0\"";
+static const std::string exampleArg6 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/0\"";
+static const std::string exampleArg7 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -imin 0 -imax 3";
+static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -min 0 -max 3";
 
-static const std::string exampleArg5 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
-static const std::string exampleArg6 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
-static const std::string exampleArg7 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -c \"m/0'/0\"";
-static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/0\"";
-
-/*
- test arguments
- -seed 000102030405060708090a0b0c0d0e0f -chain "m/0'/0"
- -s 000102030405060708090a0b0c0d0e0f -c "m/0'/0"
- -extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -imin 0 -imax 3
- -extkey "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw" -min 0 -max 3
- -extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
- -extkey "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw"
- -ek "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -c "m/0'/0"
- -ek "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw" -c "m/0/0"
- //*/
-
+static const std::string exampleArg9 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
+static const std::string exampleArg10 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
 void printExtKeys(KeyTree& keyTree) {
     while (! keyTree.isAtEndOfChain()) { //TODO: change to iterator instead
@@ -80,10 +78,24 @@ void printExtKeys(KeyTree& keyTree) {
     }
 }
 
-void printExtKeysFromSeed(const std::string seed, const std::string chainStr) {
-    KeyTree keyTree(seed, chainStr);
+void printExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
+    std::string seedHex;
+    if (seedStringFormat == StringUtils::StringFormat::ascii) {
+        seedHex = StringUtils::string_to_hex(seed);
+        
+    } else if (seedStringFormat == StringUtils::StringFormat::hex) {
+        if (! StringUtils::isHex(seed))
+            throw std::runtime_error("Invalid hex string \"" + seed + "\"");
+        
+        seedHex = seed;
+    } else throw std::runtime_error("Invalid seed string format.");
+   
+    Logger::log("Master (hex): " + seedHex);
+
+    
+    KeyTree keyTree(seed, chainStr, seedStringFormat);
     KeyNode data = keyTree.getCurrentInChain();
-    Logger::debug("Master (hex): " + seed);
+    
     Logger::log("* [Chain " + data.chain + "]");
     Logger::log("  * ext pub: " + data.extpub);
     Logger::log("  * ext prv: " + data.extprv);
@@ -123,16 +135,16 @@ void printKeyAddressofExtKey(const std::string extKey) {
 
 
 void testVector1() {
-    printExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000");
+    printExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::StringFormat::hex);
 }
 
 void testVector2() {
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
-    printExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2");
+    printExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::StringFormat::hex);
 }
 
 void testPrintExtKeysFromSeed() {
-    printExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/0");
+    printExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/0", StringUtils::StringFormat::hex);
 }
 
 void testPrintExtKeysFromExtKey() {
@@ -164,12 +176,12 @@ void testPrintKeyAddressofExtKey() {
 template<typename It>
 std::map<std::string, std::string> parse_arguments(It begin, It end) {
     std::map<std::string, std::string> argsDict;
-    
+
     for (auto it = begin ; it != end; ++it) {
         std::string arg = *it;
         if (arg[0] != '-')
             throw std::invalid_argument("Invalid arguments.");
-        
+
         
         arg = arg.substr(1);
         if (arg == HELP) {
@@ -179,6 +191,13 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         else if (arg == SEED || arg == SEED_SHORT) {
             ++it;
             argsDict[SEED] = *it;
+            argsDict[SEED_FORMAT] = ""; //assumes ascii
+        }
+        else if (arg == SEED_HEX || arg == SEED_HEX_SHORT
+                 || arg == SEED_SHORT_HEX || arg == SEED_SHORT_HEX_SHORT) {
+            ++it;
+            argsDict[SEED] = *it;
+            argsDict[SEED_FORMAT] = "hex";
         } else if(arg == EXTENDEDKEY || arg == EXTENDEDKEY_SHORT) {
             ++it;
             argsDict[EXTENDEDKEY] = *it;
@@ -206,23 +225,25 @@ void printExamples() {
     Logger::log("");
     
     Logger::log("Given Seed and Chain will print Child Extended Keys:");
-    Logger::log(appName+exampleArg1);
-    Logger::log(appName+exampleArg2);
+    Logger::log(cmdName+exampleArg1);
+    Logger::log(cmdName+exampleArg2);
+    Logger::log(cmdName+exampleArg3);
+    Logger::log(cmdName+exampleArg4);
     Logger::log("");
     
     Logger::log("Given Extended Key and Chain will print Child Extended Keys:");
-    Logger::log(appName+exampleArg7);
-    Logger::log(appName+exampleArg8);
+    Logger::log(cmdName+exampleArg5);
+    Logger::log(cmdName+exampleArg6);
     Logger::log("");
     
     Logger::log("Given Extended Key and range will print Private Keys and Addresses from child of Extended Key in given range:");
-    Logger::log(appName+exampleArg3);
-    Logger::log(appName+exampleArg4);
+    Logger::log(cmdName+exampleArg7);
+    Logger::log(cmdName+exampleArg8);
     Logger::log("");
     
     Logger::log("Given Extended Key will print Private Key and Address of Extended Key:");
-    Logger::log(appName+exampleArg5);
-    Logger::log(appName+exampleArg6);
+    Logger::log(cmdName+exampleArg9);
+    Logger::log(cmdName+exampleArg10);
     Logger::log("");
 }
 
@@ -238,7 +259,14 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
     } else if (argsDict[SEED] != "" && argsDict[CHAIN] != "") {
         std::string seed = argsDict[SEED];
         std::string chain = argsDict[CHAIN];
-        printExtKeysFromSeed(seed, chain);
+        
+        StringUtils::StringFormat seed_format;
+        if (argsDict[SEED_FORMAT] == "hex")
+            seed_format = StringUtils::StringFormat::hex;
+        else
+            seed_format = StringUtils::StringFormat::ascii;
+        
+        printExtKeysFromSeed(seed, chain, seed_format);
     } else if (argsDict[EXTENDEDKEY] != "" && argsDict[CHAIN] != "") {
         std::string extkey = argsDict[EXTENDEDKEY];
         std::string chain = argsDict[CHAIN];
@@ -254,7 +282,7 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
     } else {
         throw std::invalid_argument("Invalid arguments.");
     }
-    
+
     return 0;
 }
 
@@ -268,14 +296,14 @@ int main(int argc, const char * argv[]) {
     
     KeyTree::setTestNet(true);
     KeyTree::setTestNet(false);
-    
+
     if (IS_DEBUG) {
         //testVector1();
         //testVector2();
         
         //testPrintExtKeysFromSeed();
         //testPrintExtKeysFromExtKey();
-        //testPrintKeyAddressesFromExtKey();
+        testPrintKeyAddressesFromExtKey();
         testPrintKeyAddressofExtKey();
     }
     
