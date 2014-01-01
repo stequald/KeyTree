@@ -1,6 +1,6 @@
 EXECUTABLE = kt
 CC = g++
-CFLAGS = -std=c++0x -Wdeprecated-declarations -Wall -g 
+CFLAGS = -std=c++0x -Wall -g 
 COMPILE = $(CC) $(CFLAGS) -c
 OBJFILES := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
 
