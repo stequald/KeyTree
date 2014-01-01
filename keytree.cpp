@@ -33,8 +33,6 @@
 
 KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
     uchar_vector s;
-
-    //*
     if (seedStringFormat == StringUtils::StringFormat::ascii) {
         s= uchar_vector(StringUtils::string_to_hex(seed));
         
@@ -47,15 +45,10 @@ KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils
         s = uchar_vector(tmp);
         
     } else throw std::runtime_error("Invalid seed string format.");
-     //*/
-    
-    //s = uchar_vector(seed);
 
-    
     Coin::HDSeed hdSeed(s);
     bytes_t k = hdSeed.getMasterKey();
     bytes_t c = hdSeed.getMasterChainCode();
-    
     Coin::HDKeychain prv(k, c);
     
     this->prv = prv;
@@ -83,8 +76,7 @@ KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t 
     
     if (key.isPrivate()) {
         this->chain = KeyTree::parseChainString(chainStr);
-    }
-    else {
+    } else {
         this->chain = KeyTree::parseChainString(chainStr, false);
     }
     
@@ -94,16 +86,10 @@ KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t 
 
 KeyNode KeyTree::getCurrentInChain() {
     KeyNode data;
-    
-    if(this->prv.isPrivate()) {
+    if(this->prv.isPrivate())
         data.extprv = toBase58Check(this->prv.extkey());
-        //uchar_vector extkey(this->prv.extkey()); data.extprv = extkey.getHex();
-    }
 
     data.extpub = toBase58Check(this->pub.extkey());
-    //uchar_vector extkey(this->pub.extkey()); data.extpub = extkey.getHex();
-    
-    
     data.chain = this->chainname;
     
     if(this->prv.isPrivate()) {
@@ -206,7 +192,6 @@ std::vector<uint32_t> KeyTree::parseChainString(const std::string chainStr, bool
     
     std::vector<std::string> splitChain = StringUtils::split(s, '/');
 
-    //assert(splitChain[0] == "m");
     if (splitChain[0] != "m")
         throw std::runtime_error("Invalid Chain string.");
     
@@ -215,21 +200,15 @@ std::vector<uint32_t> KeyTree::parseChainString(const std::string chainStr, bool
     for(auto it=splitChain.begin()+1; it!=splitChain.end(); ++it) {
         std::string node = *it;
         
-        if (node[0] == 'i') {
-          //Logger::debug("is i: ");
-        }
-        else {
-            if (node.back() == '\'') {
-                if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
-
-                node = node.substr(0,node.length()-1);
-                uint32_t num = std::stoi(node);
-                chain.push_back(KeyTree::toPrime(num));
-            }
-            else {
-                uint32_t num = std::stoi(node);
-                chain.push_back(num);
-            }
+        if (node.back() == '\'') {
+            if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
+            
+            node = node.substr(0,node.length()-1);
+            uint32_t num = std::stoi(node);
+            chain.push_back(KeyTree::toPrime(num));
+        } else {
+            uint32_t num = std::stoi(node);
+            chain.push_back(num);
         }
     }
     
@@ -254,19 +233,12 @@ std::pair<std::string,std::string> KeyTree::generatePrivateKey(const Coin::HDKey
     if (! keyChain.isPrivate()) throw std::runtime_error("Not private extended key.");
     
     std::pair<uchar_vector,uchar_vector> tmp;
-    //std::vector<uint32_t> sequence = {0,0,i};
     std::vector<uint32_t> sequence = {i};
     tmp = KeyTree::vectorTranverseCKD(sequence, keyChain.key(), keyChain.chain_code());
     uchar_vector k = tmp.first.getHex();
     uchar_vector chain = tmp.second;
     
     std::string key = KeyTree::SecretToASecret(k, true);
-    
-    //Logger::debug("\ni: " + std::to_string(i));
-    //Logger::debug("k: " + k.getHex());
-    //Logger::debug("chain: " + chain.getHex());
-    //Logger::debug("privateKey: " + key);
-    
     std::string address = KeyTree::getAddressFromKeyChain(keyChain, i);
     
     return std::pair<std::string,std::string>(key,address);
@@ -275,35 +247,15 @@ std::pair<std::string,std::string> KeyTree::generatePrivateKey(const Coin::HDKey
 
 std::string KeyTree::getAddressFromKeyChain(const Coin::HDKeychain& keyChain, uint32_t i) {
     std::pair<uchar_vector,uchar_vector> tmp;
-    //std::vector<uint32_t> sequence = {0,0,i};
     std::vector<uint32_t> sequence = {i};
     tmp = KeyTree::vectorTranverseCKD_Prime(sequence, keyChain.pubkey(), keyChain.chain_code());
     uchar_vector K = tmp.first.getHex();
     uchar_vector chain = tmp.second;
-    
-    //Logger::debug("K: " + K.getHex());
-    //Logger::debug("chain: " + chain.getHex());
-    
     std::string address = KeyTree::public_key_to_bc_address(K);
     return address;
 }
 
-
-
-std::pair<std::string,std::string> KeyTree::generateAddress(const Coin::HDKeychain& keyChain, uint32_t i) {
-    if (keyChain.isPrivate()) throw std::runtime_error("Not public extended key.");
-    
-    std::pair<uchar_vector,uchar_vector> tmp;
-    //std::vector<uint32_t> sequence = {0,0,i};
-    std::vector<uint32_t> sequence = {i};
-    tmp = KeyTree::vectorTranverseCKD_Prime(sequence, keyChain.pubkey(), keyChain.chain_code());
-    uchar_vector K = tmp.first.getHex();
-    uchar_vector chain = tmp.second;
-    
-    std::string address = KeyTree::public_key_to_bc_address(K);
-    return std::pair<std::string,std::string>("",address);
-}
-
+#pragma mark Child Key Deriviation
 
 std::pair<uchar_vector,uchar_vector> KeyTree::CKD_prime(uchar_vector K, uchar_vector c, uint32_t i) {
     Coin::HDKeychain parentpub(K, c);
@@ -312,10 +264,6 @@ std::pair<uchar_vector,uchar_vector> KeyTree::CKD_prime(uchar_vector K, uchar_ve
     Coin::HDKeychain pub = parentpub.getChild(i);
     uchar_vector K_i(pub.pubkey());
     uchar_vector c_i(pub.chain_code());
-    
-    //Logger::debug("K_i: " + K_i.getHex());
-    //Logger::debug("c_i: " + c_i.getHex());
-    
     std::pair<uchar_vector,uchar_vector> ret(K_i, c_i);
     return ret;
 }
@@ -329,88 +277,15 @@ std::pair<uchar_vector,uchar_vector> KeyTree::CKD(uchar_vector k, uchar_vector c
     Coin::HDKeychain pub = parentpub.getChild(i);
     uchar_vector k_i(pub.key());
     uchar_vector c_i(pub.chain_code());
-    
-    //Logger::debug("k_i: " + k_i.getHex());
-    //Logger::debug("c_i: " + c_i.getHex());
-    
     std::pair<uchar_vector,uchar_vector> ret(k_i, c_i);
     return ret;
 }
 
-#pragma mark public key
-
-uchar_vector KeyTree::hash_160(const uchar_vector public_key) {
-    return mdsha(public_key);
-}
-
-std::string KeyTree::public_key_to_bc_address(const uchar_vector public_key) {
-    uchar_vector h160 = KeyTree::hash_160(public_key);
-    //Logger::debug("h160: " + h160.getHex());
-    return KeyTree::hash_160_to_bc_address(h160);
-}
-
-std::string KeyTree::hash_160_to_bc_address(const uchar_vector h160, int addrtype) {
-    uchar_vector vh160;
-    
-    //vh160.push_back((unsigned char)Python::chr(addrtype)); //TODO: does not work, why?
-    vh160.push_back((unsigned char)addrtype);
-    
-    vh160 += h160;
-    //Logger::debug("vh160: " + vh160.getHex());
-    
-    uchar_vector h = KeyTree::Hash(vh160);
-    //Logger::debug("Hash: " + h.getHex());
-    
-    uchar_vector addr = vh160;
-    uchar_vector tmp(h.begin(), h.begin()+4);
-    addr += tmp;
-    
-    //Logger::debug("addrgetHex: " + addr.getHex());
-    
-    //return toBase58Check(addr);
-    return toBase58(addr);
-}
-
-#pragma mark private key
-
-uchar_vector KeyTree::Hash(uchar_vector x) {
-    return sha256_2(x);
-}
-
-std::string KeyTree::EncodeBase58Check(uchar_vector vchIn) {
-    uchar_vector hash = KeyTree::Hash(vchIn);
-    uchar_vector tmp(hash.begin(), hash.begin()+4);
-    uchar_vector ret = vchIn+tmp;
-    //Logger::debug("EncodeBase58Check: " + ret.getHex());
-    
-    //both works, pick one
-    //return toBase58Check(ret);
-    return toBase58(ret);
-}
-
-std::string KeyTree::SecretToASecret(const uchar_vector secret, bool compressed) {
-    //Logger::debug("secret: " + secret.getHex());
-    uchar_vector vchIn;
-    
-    vchIn.push_back('\x80');
-    //vchIn.push_back((addrtype+128)&255);
-    //vchIn.push_back(Python::chr((addrtype+128)&255)); //TODO: does not work, fault with python electrum??
-    
-    vchIn += secret;
-    if (compressed) vchIn.push_back('\01');
-    
-    //Logger::debug("vchIn: " + vchIn.getHex());
-    return EncodeBase58Check(vchIn);
-}
-
 std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain) {
-    //Logger::debug("k: " + k.getHex());
-    //Logger::debug("chain: " + chain.getHex());
-    
     for(auto it=sequence.begin(); it!=sequence.end(); ++it) {
         int i = *it;
         std::pair<uchar_vector,uchar_vector> tmp = CKD(k, chain, i);
-        k = tmp.first.getHex().substr(2); //rid leading 0x03
+        k = tmp.first.getHex().substr(2); //rid leading byte
         chain = tmp.second;
         Logger::debug("\ni: " + std::to_string(i));
         Logger::debug("k: " + k.getHex());
@@ -421,9 +296,6 @@ std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD(std::vector<uin
 }
 
 std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD_Prime(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain) {
-    //Logger::debug("k: " + k.getHex());
-    //Logger::debug("chain: " + chain.getHex());
-    
     for(auto it=sequence.begin(); it!=sequence.end(); ++it) {
         int i = *it;
         std::pair<uchar_vector,uchar_vector> tmp = CKD_prime(k, chain, i);
@@ -437,3 +309,39 @@ std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD_Prime(std::vect
     return std::pair<uchar_vector,uchar_vector>(k, chain);
 }
 
+#pragma mark address
+
+uchar_vector KeyTree::hash_160(const uchar_vector public_key) {
+    return mdsha(public_key);
+}
+
+std::string KeyTree::public_key_to_bc_address(const uchar_vector public_key) {
+    uchar_vector h160 = KeyTree::hash_160(public_key);
+    return KeyTree::hash_160_to_bc_address(h160);
+}
+
+std::string KeyTree::hash_160_to_bc_address(const uchar_vector h160, int addrtype) {
+    uchar_vector vh160;
+    vh160.push_back((unsigned char)addrtype);
+    vh160 += h160;
+    return toBase58Check(vh160);
+}
+
+#pragma mark private key
+
+uchar_vector KeyTree::Hash(uchar_vector x) {
+    return sha256_2(x);
+}
+
+std::string KeyTree::EncodeBase58Check(uchar_vector vchIn) {
+    return toBase58Check(vchIn);
+}
+
+std::string KeyTree::SecretToASecret(const uchar_vector secret, bool compressed) {
+    uchar_vector vchIn;
+    vchIn.push_back('\x80');
+    vchIn += secret;
+    if (compressed) vchIn.push_back('\01');
+    
+    return EncodeBase58Check(vchIn);
+}

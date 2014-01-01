@@ -61,17 +61,16 @@ private:
     static inline bool isPrime(uint32_t i) { return 0x80000000 & i; }
     static std::string iToString(uint32_t i);
     
-    
-    static std::pair<std::string,std::string> generateAddress(const Coin::HDKeychain& keyChain, uint32_t i);
+    static std::string getAddressFromKeyChain(const Coin::HDKeychain& keyChain, uint32_t i);
     static std::pair<std::string,std::string> generatePrivateKey(const Coin::HDKeychain& keyChain, uint32_t i);
-    static std::string SecretToASecret(const uchar_vector secret, bool compressed = false);
-    static std::string public_key_to_bc_address(const uchar_vector public_key);
     
     static std::pair<uchar_vector,uchar_vector> CKD(uchar_vector k, uchar_vector c, uint32_t i);
     static std::pair<uchar_vector,uchar_vector> CKD_prime(uchar_vector K, uchar_vector c, uint32_t i);
     static std::pair<uchar_vector,uchar_vector> vectorTranverseCKD(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain);
     static std::pair<uchar_vector,uchar_vector> vectorTranverseCKD_Prime(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain);
-    static std::string getAddressFromKeyChain(const Coin::HDKeychain& keyChain, uint32_t i);
+    
+    static std::string SecretToASecret(const uchar_vector secret, bool compressed = false);
+    static std::string public_key_to_bc_address(const uchar_vector public_key);
     static uchar_vector hash_160(const uchar_vector public_key);
     static std::string hash_160_to_bc_address(const uchar_vector h160, int addrtype = 0);
     static uchar_vector Hash(uchar_vector x);

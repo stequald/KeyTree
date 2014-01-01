@@ -187,13 +187,11 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         if (arg == HELP) {
             argsDict[HELP] = HELP;
             break;
-        }
-        else if (arg == SEED || arg == SEED_SHORT) {
+        } else if (arg == SEED || arg == SEED_SHORT) {
             ++it;
             argsDict[SEED] = *it;
             argsDict[SEED_FORMAT] = ""; //assumes ascii
-        }
-        else if (arg == SEED_HEX || arg == SEED_HEX_SHORT
+        } else if (arg == SEED_HEX || arg == SEED_HEX_SHORT
                  || arg == SEED_SHORT_HEX || arg == SEED_SHORT_HEX_SHORT) {
             ++it;
             argsDict[SEED] = *it;
