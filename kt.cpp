@@ -66,15 +66,19 @@ static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA
 static const std::string exampleArg9 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 static const std::string exampleArg10 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
+void outputString(const std::string str) {
+    Logger::log(str);
+}
+
 void printExtKeys(KeyTree& keyTree) {
     while (! keyTree.isAtEndOfChain()) { //TODO: change to iterator instead
         KeyNode data = keyTree.getNextInChain();
-        Logger::log("* [Chain " + data.chain + "]");
-        Logger::log("  * ext pub: " + data.extpub);
-        if (data.extprv != "") Logger::log("  * ext prv: " + data.extprv);
-        //Logger::log("  * priv key: " + data.privkey);
-        //Logger::log("  * address: " + data.address);
-        //Logger::log("");
+        outputString("* [Chain " + data.chain + "]");
+        outputString("  * ext pub: " + data.extpub);
+        if (data.extprv != "") outputString("  * ext prv: " + data.extprv);
+        //outputString("  * priv key: " + data.privkey);
+        //outputString("  * address: " + data.address);
+        //outputString("");
     }
 }
 
@@ -90,18 +94,18 @@ void printExtKeysFromSeed(const std::string seed, const std::string chainStr, St
         seedHex = seed;
     } else throw std::runtime_error("Invalid seed string format.");
    
-    Logger::log("Master (hex): " + seedHex);
+    outputString("Master (hex): " + seedHex);
 
     
     KeyTree keyTree(seed, chainStr, seedStringFormat);
     KeyNode data = keyTree.getCurrentInChain();
     
-    Logger::log("* [Chain " + data.chain + "]");
-    Logger::log("  * ext pub: " + data.extpub);
-    Logger::log("  * ext prv: " + data.extprv);
-    //Logger::log("  * priv key: " + data.privkey);
-    //Logger::log("  * address: " + data.address);
-    //Logger::log("");
+    outputString("* [Chain " + data.chain + "]");
+    outputString("  * ext pub: " + data.extpub);
+    outputString("  * ext prv: " + data.extprv);
+    //outputString("  * priv key: " + data.privkey);
+    //outputString("  * address: " + data.address);
+    //outputString("");
     printExtKeys(keyTree);
 }
 
@@ -113,24 +117,24 @@ void printExtKeysFromExtKey(const std::string extKey, const std::string chainStr
 void printKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, uint32_t i_max = 9) {
     for (uint32_t i = i_min; i < i_max; i++ ) {
         KeyNode data = KeyTree::getChildOfExtKey(extKey, i);
-        //Logger::log("* [Chain " + data.chain + "]");
-        //Logger::log("  * ext pub: " + data.extpub);
-        //Logger::log("  * ext prv: " + data.extprv);
-        if (data.privkey != "") Logger::log("  * priv key: " + data.privkey);
-        Logger::log("  * address: " + data.address);
-        Logger::log("");
+        //outputString("* [Chain " + data.chain + "]");
+        //outputString("  * ext pub: " + data.extpub);
+        //outputString("  * ext prv: " + data.extprv);
+        if (data.privkey != "") outputString("  * priv key: " + data.privkey);
+        outputString("  * address: " + data.address);
+        outputString("");
     }
 }
 
 void printKeyAddressofExtKey(const std::string extKey) {
     KeyTree keyTree(extKey, "m", 0, 0);
     KeyNode data = keyTree.getCurrentInChain();
-    //Logger::log("* [Chain " + data.chain + "]");
-    Logger::log("  * ext pub: " + data.extpub);
-    if (data.extprv != "") Logger::log("  * ext prv: " + data.extprv);
-    if (data.privkey != "") Logger::log("  * priv key: " + data.privkey);
-    Logger::log("  * address: " + data.address);
-    Logger::log("");
+    //outputString("* [Chain " + data.chain + "]");
+    outputString("  * ext pub: " + data.extpub);
+    if (data.extprv != "") outputString("  * ext prv: " + data.extprv);
+    if (data.privkey != "") outputString("  * priv key: " + data.privkey);
+    outputString("  * address: " + data.address);
+    outputString("");
 }
 
 
@@ -218,31 +222,31 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
 }
 
 void printExamples() {
-    Logger::log("Input parameters can be in hex or base58.");
-    Logger::log("Here are some examples:");
-    Logger::log("");
+    outputString("Input parameters can be in hex or base58.");
+    outputString("Here are some examples:");
+    outputString("");
     
-    Logger::log("Given Seed and Chain will print Child Extended Keys:");
-    Logger::log(cmdName+exampleArg1);
-    Logger::log(cmdName+exampleArg2);
-    Logger::log(cmdName+exampleArg3);
-    Logger::log(cmdName+exampleArg4);
-    Logger::log("");
+    outputString("Given Seed and Chain will print Child Extended Keys:");
+    outputString(cmdName+exampleArg1);
+    outputString(cmdName+exampleArg2);
+    outputString(cmdName+exampleArg3);
+    outputString(cmdName+exampleArg4);
+    outputString("");
     
-    Logger::log("Given Extended Key and Chain will print Child Extended Keys:");
-    Logger::log(cmdName+exampleArg5);
-    Logger::log(cmdName+exampleArg6);
-    Logger::log("");
+    outputString("Given Extended Key and Chain will print Child Extended Keys:");
+    outputString(cmdName+exampleArg5);
+    outputString(cmdName+exampleArg6);
+    outputString("");
     
-    Logger::log("Given Extended Key and range will print Private Keys and Addresses from child of Extended Key in given range:");
-    Logger::log(cmdName+exampleArg7);
-    Logger::log(cmdName+exampleArg8);
-    Logger::log("");
+    outputString("Given Extended Key and range will print Private Keys and Addresses from child of Extended Key in given range:");
+    outputString(cmdName+exampleArg7);
+    outputString(cmdName+exampleArg8);
+    outputString("");
     
-    Logger::log("Given Extended Key will print Private Key and Address of Extended Key:");
-    Logger::log(cmdName+exampleArg9);
-    Logger::log(cmdName+exampleArg10);
-    Logger::log("");
+    outputString("Given Extended Key will print Private Key and Address of Extended Key:");
+    outputString(cmdName+exampleArg9);
+    outputString(cmdName+exampleArg10);
+    outputString("");
 }
 
 int handle_arguments(std::map<std::string, std::string> argsDict) {
@@ -310,12 +314,12 @@ int main(int argc, const char * argv[]) {
         return handle_arguments(argsDict);
     }
     catch (const std::invalid_argument& err) {
-        Logger::log("Error: " + std::string(err.what()));
-        Logger::log("---------------------------------------------------");
+        outputString("Error: " + std::string(err.what()));
+        outputString("---------------------------------------------------");
         printExamples();
     }
     catch (const std::runtime_error& err) {
-        Logger::log("Error: " + std::string(err.what()));
+        outputString("Error: " + std::string(err.what()));
     }
 }
 
