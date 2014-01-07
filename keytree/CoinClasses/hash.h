@@ -25,14 +25,6 @@
 #ifndef __HASH_H___
 #define __HASH_H___
 
-#ifdef __APPLE__
-#  define USES_APPLE_DEPRECATED_API DIAG_OFF(deprecated-declarations)
-#  define USES_APPLE_RST DIAG_ON(deprecated-declarations)
-#else
-#  define USES_APPLE_DEPRECATED_API
-#  define USES_APPLE_RST
-#endif
-
 #include "uchar_vector.h"
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
