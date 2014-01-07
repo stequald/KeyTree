@@ -22,30 +22,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#include "keytree.h"
 #include <sstream>
 #include <regex>
 #include <cassert>
-#include "keytree.h"
-#include "hdkeys.h"
 #include "Base58Check.h"
 
 
 
 KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
     uchar_vector s;
-    if (seedStringFormat == StringUtils::StringFormat::ascii) {
+    if (seedStringFormat == StringUtils::ascii) {
         s= uchar_vector(StringUtils::string_to_hex(seed));
         
-    } else if (seedStringFormat == StringUtils::StringFormat::hex) {
+    } else if (seedStringFormat == StringUtils::hex) {
         if (! StringUtils::isHex(seed))
-            throw std::runtime_error("Invalid hex string \"" + seed + "\"");
-
+        throw std::runtime_error("Invalid hex string \"" + seed + "\"");
+        
         std::string tmp = seed;
         std::transform(tmp.begin(), tmp.end(), tmp.begin(), ::tolower);
         s = uchar_vector(tmp);
         
     } else throw std::runtime_error("Invalid seed string format.");
-
+    
     Coin::HDSeed hdSeed(s);
     bytes_t k = hdSeed.getMasterKey();
     bytes_t c = hdSeed.getMasterChainCode();
@@ -62,11 +61,11 @@ KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils
 KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t i_min, uint32_t i_max) {
     uchar_vector extendedKey;
     if (isBase58CheckValid(extKey))
-        extendedKey = fromBase58ExtKey(extKey);
+    extendedKey = fromBase58ExtKey(extKey);
     else if (StringUtils::isHex(extKey))
-        extendedKey = uchar_vector(extKey);
+    extendedKey = uchar_vector(extKey);
     else
-        throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
+    throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
     
     Coin::HDKeychain key(extendedKey);
     
@@ -87,8 +86,8 @@ KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t 
 KeyNode KeyTree::getCurrentInChain() {
     KeyNode data;
     if(this->prv.isPrivate())
-        data.extprv = toBase58Check(this->prv.extkey());
-
+    data.extprv = toBase58Check(this->prv.extkey());
+    
     data.extpub = toBase58Check(this->pub.extkey());
     data.chain = this->chainname;
     
@@ -97,7 +96,7 @@ KeyNode KeyTree::getCurrentInChain() {
         k = k.getHex().substr(2);
         data.privkey = KeyTree::SecretToASecret(k, true);
     }
-
+    
     uchar_vector K = this->prv.pubkey();
     data.address = KeyTree::public_key_to_bc_address(K);
     return data;
@@ -108,7 +107,7 @@ KeyNode KeyTree::getNextInChain() {
     
     // Append subtree label to name
     this->chainname += "/" + KeyTree::iToString(this->chain[this->chain_idx]);
-
+    
     if (!KeyTree::isPrime(this->chain[this->chain_idx])) this->parentpub = this->pub;
     
     // Get child private and public keychains
@@ -120,7 +119,7 @@ KeyNode KeyTree::getNextInChain() {
     
     // We need to make sure child of pub = pub of child for public derivation
     if (!KeyTree::isPrime(this->chain[this->chain_idx]))
-        assert(this->pub == this->parentpub.getChild(this->chain[this->chain_idx]));
+    assert(this->pub == this->parentpub.getChild(this->chain[this->chain_idx]));
     
     this->chain_idx++;
     
@@ -130,25 +129,25 @@ KeyNode KeyTree::getNextInChain() {
 KeyNode KeyTree::getChildOfExtKey(const std::string extKey, uint32_t i) {
     uchar_vector extendedKey;
     if (isBase58CheckValid(extKey))
-        extendedKey = fromBase58ExtKey(extKey);
+    extendedKey = fromBase58ExtKey(extKey);
     else if (extKey.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos)
-        extendedKey = uchar_vector(extKey);
+    extendedKey = uchar_vector(extKey);
     else
-        throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
-
+    throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
+    
     Coin::HDKeychain key(extendedKey);
     
     Coin::HDKeychain privChild;
     Coin::HDKeychain pubChild;
     
     KeyNode data;
-
+    
     if (key.isPrivate()) {
         privChild = key.getChild(i);
         pubChild = privChild.getPublic();
         data.extprv = toBase58Check(privChild.extkey());
         data.extpub = toBase58Check(pubChild.extkey());
-    
+        
         uchar_vector k = privChild.key();
         k = k.getHex().substr(2);
         data.privkey = KeyTree::SecretToASecret(k, true);
@@ -191,9 +190,9 @@ std::vector<uint32_t> KeyTree::parseChainString(const std::string chainStr, bool
     const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
     
     std::vector<std::string> splitChain = StringUtils::split(s, '/');
-
+    
     if (splitChain[0] != "m")
-        throw std::runtime_error("Invalid Chain string.");
+    throw std::runtime_error("Invalid Chain string.");
     
     if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
     
@@ -255,8 +254,6 @@ std::string KeyTree::getAddressFromKeyChain(const Coin::HDKeychain& keyChain, ui
     return address;
 }
 
-#pragma mark Child Key Deriviation
-
 std::pair<uchar_vector,uchar_vector> KeyTree::CKD_prime(uchar_vector K, uchar_vector c, uint32_t i) {
     Coin::HDKeychain parentpub(K, c);
     if (parentpub.isPrivate()) throw std::runtime_error("Not public extended key.");
@@ -309,8 +306,6 @@ std::pair<uchar_vector,uchar_vector> KeyTree::vectorTranverseCKD_Prime(std::vect
     return std::pair<uchar_vector,uchar_vector>(k, chain);
 }
 
-#pragma mark address
-
 uchar_vector KeyTree::hash_160(const uchar_vector public_key) {
     return mdsha(public_key);
 }
@@ -326,8 +321,6 @@ std::string KeyTree::hash_160_to_bc_address(const uchar_vector h160, int addrtyp
     vh160 += h160;
     return toBase58Check(vh160);
 }
-
-#pragma mark private key
 
 uchar_vector KeyTree::Hash(uchar_vector x) {
     return sha256_2(x);
