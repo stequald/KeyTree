@@ -27,9 +27,8 @@
 
 #include <iostream>
 #include <vector>
-#include "hdkeys.h"
+#include "CoinClasses/hdkeys.h"
 #include "logger.h"
-#include "Base58Check.h"
 #include "stringutils.h"
 
 

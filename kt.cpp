@@ -26,11 +26,20 @@
 #include <algorithm>
 #include <map>
 #include <stdexcept>
-#include "keytree.h"
-#include "logger.h"
+#include "keytree/keytree.h"
+#include "keytree/logger.h"
+
+#ifdef __APPLE__
+#  define USES_APPLE_DEPRECATED_API DIAG_OFF(deprecated-declarations)
+#  define USES_APPLE_RST DIAG_ON(deprecated-declarations)
+#else
+#  define USES_APPLE_DEPRECATED_API
+#  define USES_APPLE_RST
+#endif
+
 using namespace std;
 
-static bool IS_DEBUG = false;
+static bool IS_DEBUG = true;
 static const std::string HELP = "help";
 
 static const std::string SEED_FORMAT = "seed_format";
@@ -84,10 +93,10 @@ void outputExtKeys(KeyTree& keyTree) {
 
 void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
     std::string seedHex;
-    if (seedStringFormat == StringUtils::StringFormat::ascii) {
+    if (seedStringFormat == StringUtils::ascii) {
         seedHex = StringUtils::string_to_hex(seed);
         
-    } else if (seedStringFormat == StringUtils::StringFormat::hex) {
+    } else if (seedStringFormat == StringUtils::hex) {
         if (! StringUtils::isHex(seed))
         throw std::runtime_error("Invalid hex string \"" + seed + "\"");
         
@@ -139,16 +148,16 @@ void outputKeyAddressofExtKey(const std::string extKey) {
 
 
 void testVector1() {
-    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::StringFormat::hex);
+    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
 }
 
 void testVector2() {
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
-    outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::StringFormat::hex);
+    outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::hex);
 }
 
 void testOutputExtKeysFromSeed() {
-    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/0", StringUtils::StringFormat::hex);
+    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/0", StringUtils::hex);
 }
 
 void testOutputExtKeysFromExtKey() {
@@ -156,8 +165,8 @@ void testOutputExtKeysFromExtKey() {
     //outputExtKeysFromExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56", "m/0'/0"); //pub  - cant do chain with ' on ext pubkey will throw except, do below
     //outputExtKeysFromExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56", "m/0/0"); //pub
     
-    //outputExtKeysFromExtKey("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", "m/0'/0"); //priv
-    outputExtKeysFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", "m/0'/0"); //pub  - cant do chain with ' on ext pubkey will throw except, do below
+    outputExtKeysFromExtKey("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", "m/0'/0"); //priv
+    //outputExtKeysFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", "m/0'/0"); //pub  - cant do chain with ' on ext pubkey will throw except, do below
     //outputExtKeysFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", "m/0/0"); //pub
 }
 
@@ -264,9 +273,9 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         
         StringUtils::StringFormat seed_format;
         if (argsDict[SEED_FORMAT] == "hex")
-        seed_format = StringUtils::StringFormat::hex;
+        seed_format = StringUtils::hex;
         else
-        seed_format = StringUtils::StringFormat::ascii;
+        seed_format = StringUtils::ascii;
         
         outputExtKeysFromSeed(seed, chain, seed_format);
     } else if (argsDict[EXTENDEDKEY] != "" && argsDict[CHAIN] != "") {
@@ -304,9 +313,9 @@ int main(int argc, const char * argv[]) {
         //testVector2();
         
         //testOutputExtKeysFromSeed();
-        //testOutputExtKeysFromExtKey();
-        testOutputKeyAddressesFromExtKey();
-        testOutputKeyAddressofExtKey();
+        testOutputExtKeysFromExtKey();
+        //testOutputKeyAddressesFromExtKey();
+        //testOutputKeyAddressofExtKey();
     }
     
     try {
