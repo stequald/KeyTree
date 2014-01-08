@@ -44,7 +44,7 @@ typedef struct {
 class KeyTree {
 public:
     KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat);
-    KeyTree(const std::string extKey, const std::string chainStr, uint32_t i_min, uint32_t i_max);
+    KeyTree(const std::string extKey, const std::string chainStr);
     KeyNode getNextInChain();
     KeyNode getCurrentInChain();
     bool isAtEndOfChain();
@@ -68,14 +68,11 @@ private:
     static std::pair<uchar_vector,uchar_vector> vectorTranverseCKD(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain);
     static std::pair<uchar_vector,uchar_vector> vectorTranverseCKD_Prime(std::vector<uint32_t> sequence, uchar_vector k, uchar_vector chain);
     
-    static std::string SecretToASecret(const uchar_vector secret, bool compressed = false);
+    static std::string secretToASecret(const uchar_vector secret, bool compressed = false);
     static std::string public_key_to_bc_address(const uchar_vector public_key);
     static uchar_vector hash_160(const uchar_vector public_key);
     static std::string hash_160_to_bc_address(const uchar_vector h160, int addrtype = 0);
-    static uchar_vector Hash(uchar_vector x);
-    static std::string EncodeBase58Check(uchar_vector vchIn);
-
-    
+    static std::string encodeBase58Check(uchar_vector vchIn);
     
     uint32_t chain_idx;
     std::string chainname;

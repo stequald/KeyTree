@@ -16,7 +16,7 @@ HEADERS = \
 kt: kt.cpp keytree.o logger.o hdkeys.o
 	$(CXX) $(CXXFLAGS) -o $@ $< keytree.o logger.o hdkeys.o -lcrypto
 
-keytree.o: $(KEYTREESRCDIR)/keytree.cpp
+keytree.o: $(KEYTREESRCDIR)/keytree.cpp $(COINCLASSESSRCDIR)/Base58Check.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 logger.o: $(KEYTREESRCDIR)/logger.cpp

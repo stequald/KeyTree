@@ -22,8 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#ifndef __keytree__stringutils__
-#define __keytree__stringutils__
+#ifndef KEYTREE_STRINGUTILS_H
+#define KEYTREE_STRINGUTILS_H
 
 #include <iostream>
 #include <vector>
@@ -68,4 +68,4 @@ public:
     }
 };
 
-#endif /* defined(__keytree__stringutils__) */
+#endif /* KEYTREE_STRINGUTILS_H */

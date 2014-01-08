@@ -29,7 +29,6 @@
 #include "CoinClasses/Base58Check.h"
 
 
-
 KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
     uchar_vector s;
     if (seedStringFormat == StringUtils::ascii) {
@@ -58,7 +57,7 @@ KeyTree::KeyTree(const std::string seed, const std::string chainStr, StringUtils
     this->chain_idx = 0;
 }
 
-KeyTree::KeyTree(const std::string extKey, const std::string chainStr, uint32_t i_min, uint32_t i_max) {
+KeyTree::KeyTree(const std::string extKey, const std::string chainStr) {
     uchar_vector extendedKey;
     if (isBase58CheckValid(extKey))
         extendedKey = fromBase58ExtKey(extKey);
@@ -94,7 +93,7 @@ KeyNode KeyTree::getCurrentInChain() {
     if(this->prv.isPrivate()) {
         uchar_vector k = this->prv.key();
         k = k.getHex().substr(2);
-        data.privkey = KeyTree::SecretToASecret(k, true);
+        data.privkey = KeyTree::secretToASecret(k, true);
     }
 
     uchar_vector K = this->prv.pubkey();
@@ -150,7 +149,7 @@ KeyNode KeyTree::getChildOfExtKey(const std::string extKey, uint32_t i) {
     
         uchar_vector k = privChild.key();
         k = k.getHex().substr(2);
-        data.privkey = KeyTree::SecretToASecret(k, true);
+        data.privkey = KeyTree::secretToASecret(k, true);
     } else {
         pubChild = key.getChild(i);
     }
@@ -237,7 +236,7 @@ std::pair<std::string,std::string> KeyTree::generatePrivateKey(const Coin::HDKey
     uchar_vector k = tmp.first.getHex();
     uchar_vector chain = tmp.second;
     
-    std::string key = KeyTree::SecretToASecret(k, true);
+    std::string key = KeyTree::secretToASecret(k, true);
     std::string address = KeyTree::getAddressFromKeyChain(keyChain, i);
     
     return std::pair<std::string,std::string>(key,address);
@@ -322,19 +321,15 @@ std::string KeyTree::hash_160_to_bc_address(const uchar_vector h160, int addrtyp
     return toBase58Check(vh160);
 }
 
-uchar_vector KeyTree::Hash(uchar_vector x) {
-    return sha256_2(x);
-}
-
-std::string KeyTree::EncodeBase58Check(uchar_vector vchIn) {
+std::string KeyTree::encodeBase58Check(uchar_vector vchIn) {
     return toBase58Check(vchIn);
 }
 
-std::string KeyTree::SecretToASecret(const uchar_vector secret, bool compressed) {
+std::string KeyTree::secretToASecret(const uchar_vector secret, bool compressed) {
     uchar_vector vchIn;
     vchIn.push_back('\x80');
     vchIn += secret;
     if (compressed) vchIn.push_back('\01');
     
-    return EncodeBase58Check(vchIn);
+    return encodeBase58Check(vchIn);
 }

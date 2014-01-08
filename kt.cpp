@@ -95,12 +95,10 @@ void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, S
         seedHex = seed;
     } else throw std::runtime_error("Invalid seed string format.");
     
-    outputString("Master (hex): " + seedHex);
-    
     
     KeyTree keyTree(seed, chainStr, seedStringFormat);
     KeyNode data = keyTree.getCurrentInChain();
-    
+    outputString("Master (hex): " + seedHex);
     outputString("* [Chain " + data.chain + "]");
     outputString("  * ext pub: " + data.extpub);
     outputString("  * ext prv: " + data.extprv);
@@ -111,7 +109,7 @@ void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, S
 }
 
 void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr) {
-    KeyTree keyTree(extKey, chainStr, 0, 9);
+    KeyTree keyTree(extKey, chainStr);
     outputExtKeys(keyTree);
 }
 
@@ -128,7 +126,7 @@ void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, 
 }
 
 void outputKeyAddressofExtKey(const std::string extKey) {
-    KeyTree keyTree(extKey, "m", 0, 0);
+    KeyTree keyTree(extKey, "m");
     KeyNode data = keyTree.getCurrentInChain();
     //outputString("* [Chain " + data.chain + "]");
     outputString("  * ext pub: " + data.extpub);
