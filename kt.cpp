@@ -28,12 +28,9 @@
 #include <stdexcept>
 #include "keytree/keytree.h"
 #include "keytree/logger.h"
-
 using namespace std;
 
-static bool IS_DEBUG = true;
 static const std::string HELP = "help";
-
 static const std::string SEED_FORMAT = "seed_format";
 
 static const std::string SEED = "seed";
@@ -72,14 +69,11 @@ void outputString(const std::string str) {
 }
 
 void outputExtKeys(KeyTree& keyTree) {
-    while (! keyTree.isAtEndOfChain()) { //TODO: change to iterator instead
+    while (! keyTree.isAtEndOfChain()) {
         KeyNode data = keyTree.getNextInChain();
         outputString("* [Chain " + data.chain + "]");
         outputString("  * ext pub: " + data.extpub);
         if (data.extprv != "") outputString("  * ext prv: " + data.extprv);
-        //outputString("  * priv key: " + data.privkey);
-        //outputString("  * address: " + data.address);
-        //outputString("");
     }
 }
 
@@ -102,9 +96,6 @@ void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, S
     outputString("* [Chain " + data.chain + "]");
     outputString("  * ext pub: " + data.extpub);
     outputString("  * ext prv: " + data.extprv);
-    //outputString("  * priv key: " + data.privkey);
-    //outputString("  * address: " + data.address);
-    //outputString("");
     outputExtKeys(keyTree);
 }
 
@@ -116,9 +107,6 @@ void outputExtKeysFromExtKey(const std::string extKey, const std::string chainSt
 void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, uint32_t i_max = 9) {
     for (uint32_t i = i_min; i < i_max; i++ ) {
         KeyNode data = KeyTree::getChildOfExtKey(extKey, i);
-        //outputString("* [Chain " + data.chain + "]");
-        //outputString("  * ext pub: " + data.extpub);
-        //outputString("  * ext prv: " + data.extprv);
         if (data.privkey != "") outputString("  * priv key: " + data.privkey);
         outputString("  * address: " + data.address);
         outputString("");
@@ -136,7 +124,6 @@ void outputKeyAddressofExtKey(const std::string extKey) {
     outputString("");
 }
 
-
 void testVector1() {
     outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
 }
@@ -144,36 +131,6 @@ void testVector1() {
 void testVector2() {
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
     outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::hex);
-}
-
-void testOutputExtKeysFromSeed() {
-    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/0", StringUtils::hex);
-}
-
-void testOutputExtKeysFromExtKey() {
-    //outputExtKeysFromExtKey("0488ade4013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae623614100edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea", "m/0'/0"); //priv
-    //outputExtKeysFromExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56", "m/0'/0"); //pub  - cant do chain with ' on ext pubkey will throw except, do below
-    //outputExtKeysFromExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56", "m/0/0"); //pub
-    
-    outputExtKeysFromExtKey("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", "m/0'/0"); //priv
-    //outputExtKeysFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", "m/0'/0"); //pub  - cant do chain with ' on ext pubkey will throw except, do below
-    //outputExtKeysFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", "m/0/0"); //pub
-}
-
-void testOutputKeyAddressesFromExtKey() {
-    //outputKeyAddressesFromExtKey("0488ade4013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae623614100edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea", 0, 2); //priv
-    //outputKeyAddressesFromExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56", 0, 2); //pub
-    
-    outputKeyAddressesFromExtKey("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7", 0, 2); //priv
-    //outputKeyAddressesFromExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw", 0, 2); //pub
-}
-
-void testOutputKeyAddressofExtKey() {
-    //outputKeyAddressofExtKey("0488ade4013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae623614100edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea"); //priv
-    //outputKeyAddressofExtKey("0488b21e013442193e8000000047fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56"); //pub
-    
-    outputKeyAddressofExtKey("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"); //priv
-    outputKeyAddressofExtKey("xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw"); //pub
 }
 
 template<typename It>
@@ -291,22 +248,12 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
 
 int main(int argc, const char * argv[]) {
     Logger::setLogLevelError();
-    //Logger::setLogLevelWarning();
-    //Logger::setLogLevelDebug();
-    //Logger::setLogLevelInfo();
     
     KeyTree::setTestNet(true);
     KeyTree::setTestNet(false);
     
-    if (IS_DEBUG) {
-        //testVector1();
-        //testVector2();
-        
-        //testOutputExtKeysFromSeed();
-        testOutputExtKeysFromExtKey();
-        //testOutputKeyAddressesFromExtKey();
-        //testOutputKeyAddressofExtKey();
-    }
+    //testVector1();
+    //testVector2();
     
     try {
         std::map<std::string, std::string> argsDict = parse_arguments(argv+1, argv+argc);
