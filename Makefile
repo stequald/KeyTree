@@ -26,4 +26,4 @@ hdkeys.o: $(COINCLASSESSRCDIR)/hdkeys.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 clean:
-	-rm -rf *.o kt
+	-rm -rf *.o $(KEYTREESRCDIR)/*.o $(COINCLASSESSRCDIR)/*.o *~ $(KEYTREESRCDIR)/*~ $(COINCLASSESSRCDIR)/*.o~ kt

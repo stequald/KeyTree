@@ -274,5 +274,5 @@ void HDKeychain::updatePubkey() {
     }
 }
 
-uint32_t HDKeychain::priv_version_ = 0;
-uint32_t HDKeychain::pub_version_ = 0;
+uint32_t HDKeychain::priv_version_ = 0x0488ADE4;
+uint32_t HDKeychain::pub_version_ = 0x0488B21E;

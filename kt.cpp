@@ -248,10 +248,8 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
 
 int main(int argc, const char * argv[]) {
     Logger::setLogLevelError();
-    
-    KeyTree::setTestNet(true);
-    KeyTree::setTestNet(false);
-    
+    //KeyTree::setTestNet(true);
+
     //testVector1();
     //testVector2();
     
