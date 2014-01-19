@@ -55,27 +55,27 @@ std::string KeyNode::address() const {
     return KeyNode::public_key_to_bc_address(K);
 }
 
-uchar_vector KeyNode::hash_160(const uchar_vector public_key) {
+uchar_vector KeyNode::hash_160(const uchar_vector& public_key) {
     return mdsha(public_key);
 }
 
-std::string KeyNode::public_key_to_bc_address(const uchar_vector public_key) {
+std::string KeyNode::public_key_to_bc_address(const uchar_vector& public_key) {
     uchar_vector h160 = KeyNode::hash_160(public_key);
     return KeyNode::hash_160_to_bc_address(h160);
 }
 
-std::string KeyNode::hash_160_to_bc_address(const uchar_vector h160, int addrtype) {
+std::string KeyNode::hash_160_to_bc_address(const uchar_vector& h160, int addrtype) {
     uchar_vector vh160;
     vh160.push_back((unsigned char)addrtype);
     vh160 += h160;
     return toBase58Check(vh160);
 }
 
-std::string KeyNode::encodeBase58Check(uchar_vector vchIn) {
+std::string KeyNode::encodeBase58Check(const uchar_vector& vchIn) {
     return toBase58Check(vchIn);
 }
 
-std::string KeyNode::secretToASecret(const uchar_vector secret, bool compressed) {
+std::string KeyNode::secretToASecret(const uchar_vector& secret, bool compressed) {
     uchar_vector vchIn;
     vchIn.push_back('\x80');
     vchIn += secret;

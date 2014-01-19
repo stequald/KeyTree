@@ -27,11 +27,15 @@
 #include <map>
 #include <stdexcept>
 #include <sstream>
+#include <deque>
 #include "keynode/keynode.h"
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
 
 using namespace std;
+typedef std::pair<uint32_t,uint32_t> Range;
+typedef std::pair<bool,Range> IsPrivateNPathRange; // < isPrivate, <min,max> >
+typedef std::deque<IsPrivateNPathRange> TreeChains;
 
 static const std::string HELP = "help";
 static const std::string SEED_FORMAT = "seed_format";
@@ -67,21 +71,25 @@ static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA
 static const std::string exampleArg9 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 static const std::string exampleArg10 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
+static const std::string exampleArg11 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(5-8)'\"";
+static const std::string exampleArg12 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
 
-void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat);
-void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr);
-void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, uint32_t i_max = 9);
-void outputKeyAddressofExtKey(const std::string extKey);
-void outputString(const std::string str);
-static void setTestNet(bool enabled);
-void outputExtKeys(KeyNode& keyNode, std::vector<uint32_t> chain);
-static std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivate = true);
+void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr, StringUtils::StringFormat seedStringFormat);
+void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr);
+void outputKeyAddressesFromExtKey(const std::string& extKey, uint32_t i_min = 0, uint32_t i_max = 9);
+void outputKeyAddressofExtKey(const std::string& extKey);
+void outputString(const std::string& str);
+void traverse(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName);
+void visit(const KeyNode& keyNode, const std::string& chainName);
+static TreeChains parseChainString(const std::string& chainStr, bool isPrivate = true);
 static std::string iToString(uint32_t i);
-uchar_vector extKeyBase58OrHexToBytes(const std::string extKey);
-static uchar_vector fromBase58ExtKey(const std::string extKey);
+uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey);
+static uchar_vector fromBase58ExtKey(const std::string& extKey);
 static inline uint32_t toPrime(uint32_t i) { return 0x80000000 | i; }
 static inline bool isPrime(uint32_t i) { return 0x80000000 & i; }
 
+
+IsPrivateNPathRange parseRange(const std::string node, bool isPrivate);
 
 void testVector1() {
     outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
@@ -162,6 +170,11 @@ void outputExamples() {
     outputString(cmdName+exampleArg9);
     outputString(cmdName+exampleArg10);
     outputString("");
+
+    outputString("It is also possible to have multiple chain paths:");
+    outputString(cmdName+exampleArg11);
+    outputString(cmdName+exampleArg12);
+
 }
 
 int handle_arguments(std::map<std::string, std::string> argsDict) {
@@ -231,11 +244,11 @@ int main(int argc, const char * argv[]) {
 
 
 
-void outputString(const std::string str) {
+void outputString(const std::string& str) {
     Logger::log(str);
 }
 
-uchar_vector extKeyBase58OrHexToBytes(const std::string extKey) {
+uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey) {
     uchar_vector extendedKey;
     if (isBase58CheckValid(extKey))
         extendedKey = fromBase58ExtKey(extKey);
@@ -247,29 +260,41 @@ uchar_vector extKeyBase58OrHexToBytes(const std::string extKey) {
     return extendedKey;
 }
 
-void outputExtKeys(KeyNode& keyNode, std::vector<uint32_t> chain) {
-    stringstream chainname;
-    chainname << "m";
-    for(auto it=chain.begin(); it!=chain.end(); ++it) {
-        uint32_t k = *it;
-        chainname << "/" << iToString(k);
-        outputString("* [Chain " + chainname.str() + "]");
-        
-        keyNode = keyNode.getChild(k);
-        if (keyNode.isPrivate()) {
-            KeyNode keyNodePub= keyNode.getPublic();
-            outputString("  * ext pub: " + toBase58Check(keyNodePub.extkey()));
-            outputString("  * ext prv: " + toBase58Check(keyNode.extkey()));
-            //outputString("  * priv key: " + keyNode.privkey());
-            //outputString("  * address: " + keyNode.address());
-        } else {
-            outputString("  * ext pub: " + toBase58Check(keyNode.extkey()));
-            //outputString("  * address: " + keyNode.address());
+void visit(const KeyNode& keyNode, const std::string& chainName) {
+    outputString("* [Chain " + chainName + "]");
+    if (keyNode.isPrivate()) {
+        KeyNode keyNodePub= keyNode.getPublic();
+        outputString("  * ext pub: " + toBase58Check(keyNodePub.extkey()));
+        outputString("  * ext prv: " + toBase58Check(keyNode.extkey()));
+        //outputString("  * priv key: " + keyNode.privkey());
+        //outputString("  * address: " + keyNode.address());
+    } else {
+        outputString("  * ext pub: " + toBase58Check(keyNode.extkey()));
+        //outputString("  * address: " + keyNode.address());
+    }
+}
+void traverse(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName) {
+    if (! treeChains.empty()) {
+        IsPrivateNPathRange IsPrivateNPathRange = treeChains.front();
+        treeChains.pop_front();
+        bool isPrivate = IsPrivateNPathRange.first;
+        Range range = IsPrivateNPathRange.second;
+        uint32_t min = range.first;
+        uint32_t max = range.second;
+
+        for (uint32_t i = min; i <= max; ++i) {
+            uint32_t k = i;
+            if (isPrivate) k = toPrime(k);
+            std::string childChainName = chainName + "/" + iToString(k);
+            KeyNode childNode = keyNode.getChild(k);
+            visit(childNode, childChainName);
+            traverse(childNode, treeChains, childChainName);
         }
+        
     }
 }
 
-void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
+void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr, StringUtils::StringFormat seedStringFormat) {
     std::string seedHex;
     if (seedStringFormat == StringUtils::ascii) {
         seedHex = StringUtils::string_to_hex(seed);
@@ -290,18 +315,18 @@ void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, S
     outputString("* [Chain m]");
     outputString("  * ext pub: " + toBase58Check(pub.extkey()));
     outputString("  * ext prv: " + toBase58Check(prv.extkey()));
-    std::vector<uint32_t> chain = parseChainString(chainStr, prv.isPrivate());
-    outputExtKeys(prv, chain);
+    TreeChains treeChains = parseChainString(chainStr, prv.isPrivate());
+    traverse(prv, treeChains, "m");
 }
 
-void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr) {
+void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr) {
     uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    std::vector<uint32_t> chain = parseChainString(chainStr, keyNode.isPrivate());
-    outputExtKeys(keyNode, chain);
+    TreeChains treeChains = parseChainString(chainStr, keyNode.isPrivate());
+    traverse(keyNode, treeChains, "m");
 }
 
-void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min, uint32_t i_max) {
+void outputKeyAddressesFromExtKey(const std::string& extKey, uint32_t i_min, uint32_t i_max) {
     uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
     
     KeyNode keyNode(extendedKey);
@@ -313,7 +338,7 @@ void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min, uint
     }
 }
 
-void outputKeyAddressofExtKey(const std::string extKey) {
+void outputKeyAddressofExtKey(const std::string& extKey) {
     uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
     
     KeyNode keyNode(extendedKey);
@@ -331,7 +356,7 @@ void outputKeyAddressofExtKey(const std::string extKey) {
 }
 
 
-uchar_vector fromBase58ExtKey(const std::string extKey) {
+uchar_vector fromBase58ExtKey(const std::string& extKey) {
     static unsigned int dummy = 0;
     uchar_vector fillKey;
     fromBase58Check(extKey, fillKey, dummy);
@@ -339,8 +364,8 @@ uchar_vector fromBase58ExtKey(const std::string extKey) {
     return uchar_vector(VERSION_BYTE+fillKey.getHex()); //append VERSION_BYTE to begining
 }
 
-std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivate) {
-    std::vector<uint32_t> chain;
+TreeChains parseChainString(const std::string& chainStr, bool isPrivate) {
+    TreeChains treeChains;
     
     const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
     
@@ -353,20 +378,49 @@ std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivat
     
     for(auto it=splitChain.begin()+1; it!=splitChain.end(); ++it) {
         std::string node = *it;
-        
         if (node.back() == '\'') {
             if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
             
             node = node.substr(0,node.length()-1);
-            uint32_t num = std::stoi(node);
-            chain.push_back(toPrime(num));
+            if (node.front() == '(' && node.back() == ')') {
+                IsPrivateNPathRange range = parseRange(node, true);
+                treeChains.push_back(range);
+            } else {
+                uint32_t num = toPrime(std::stoi(node));
+                treeChains.push_back(IsPrivateNPathRange(true , Range(num, num)));
+            }
         } else {
-            uint32_t num = std::stoi(node);
-            chain.push_back(num);
+            if (node.front() == '(' && node.back() == ')') {
+                IsPrivateNPathRange range = parseRange(node, false);
+                treeChains.push_back(range);
+            } else {
+                uint32_t num = std::stoi(node);
+                treeChains.push_back(IsPrivateNPathRange(false , Range(num, num)));
+            }
+            
+            
         }
     }
     
-    return chain;
+    return treeChains;
+}
+
+IsPrivateNPathRange parseRange(const std::string node, bool isPrivate) {
+    //node must be like (123-9345)
+    const std::string minMaxString =  node.substr(1,node.length()-2);
+    const std::vector<std::string> minMaxPair = StringUtils::split(minMaxString, '-');
+    
+    if (minMaxPair.size() != 2)
+        throw std::invalid_argument("Invalid arguments.");
+
+    uint32_t min = std::stoi(minMaxPair[0]);
+    uint32_t max = std::stoi(minMaxPair[1]);
+    if (isPrivate) {
+        return IsPrivateNPathRange(true, Range(min, max));
+    } else {
+        return IsPrivateNPathRange(false, Range(min, max));
+    }
+
 }
 
 std::string iToString(uint32_t i) {

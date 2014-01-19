@@ -40,11 +40,11 @@ public:
     static void setLogLevelWarning() {logLevel_ = LOGLEVEL_WARNING;}
     static void setLogLevelError() {logLevel_ = LOGLEVEL_ERROR;}
     
-    static void info(std::string str) {  if (logLevel_ >= LOGLEVEL_INFO) std::cout << str << std::endl;}
-    static void warning(std::string str) { if (logLevel_ >= LOGLEVEL_DEBUG) std::cout << str << std::endl;}
-    static void debug(std::string str) {  if (logLevel_ >= LOGLEVEL_WARNING) std::cout << str << std::endl;}
-    static void error(std::string str) {  if (logLevel_ >= LOGLEVEL_ERROR) std::cout << str << std::endl;}
-    static void log(std::string str) { std::cout << str << std::endl;}
+    static void info(const std::string& str) {  if (logLevel_ >= LOGLEVEL_INFO) std::cout << str << std::endl;}
+    static void warning(const std::string& str) { if (logLevel_ >= LOGLEVEL_DEBUG) std::cout << str << std::endl;}
+    static void debug(const std::string& str) {  if (logLevel_ >= LOGLEVEL_WARNING) std::cout << str << std::endl;}
+    static void error(const std::string& str) {  if (logLevel_ >= LOGLEVEL_ERROR) std::cout << str << std::endl;}
+    static void log(const std::string& str) { std::cout << str << std::endl;}
 private:
     static unsigned int logLevel_;
     
