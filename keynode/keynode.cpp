@@ -83,3 +83,8 @@ std::string KeyNode::secretToASecret(const uchar_vector secret, bool compressed)
     
     return encodeBase58Check(vchIn);
 }
+
+void KeyNode::setTestNet(bool enabled) {
+    if (enabled) Coin::HDKeychain::setVersions(0x04358394, 0x043587CF);
+    else Coin::HDKeychain::setVersions(0x0488ADE4, 0x0488B21E);
+}

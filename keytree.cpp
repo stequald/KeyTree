@@ -210,7 +210,7 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
 int main(int argc, const char * argv[]) {
     Logger::setLogLevelError();
     Logger::setLogLevelDebug();
-    //setTestNet(true);
+    //KeyNode::setTestNet(true);
 
     //testVector1();
     //testVector2();
@@ -367,11 +367,6 @@ std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivat
     }
     
     return chain;
-}
-
-void setTestNet(bool enabled) {
-    if (enabled) Coin::HDKeychain::setVersions(0x04358394, 0x043587CF);
-    else Coin::HDKeychain::setVersions(0x0488ADE4, 0x0488B21E);
 }
 
 std::string iToString(uint32_t i) {

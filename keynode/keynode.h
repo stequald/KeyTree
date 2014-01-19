@@ -45,6 +45,7 @@ public:
     KeyNode getPublic() const;
     std::string address() const;
     std::string privkey() const;
+    static void setTestNet(bool enabled);
 private:
     static std::string secretToASecret(const uchar_vector secret, bool compressed = false);
     static std::string public_key_to_bc_address(const uchar_vector public_key);
