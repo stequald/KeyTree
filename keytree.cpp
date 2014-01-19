@@ -26,8 +26,11 @@
 #include <algorithm>
 #include <map>
 #include <stdexcept>
-#include "keytree/keytree.h"
-#include "keytree/logger.h"
+#include <sstream>
+#include "keynode/keynode.h"
+#include "keynode/logger.h"
+#include "keynode/CoinClasses/Base58Check.h"
+
 using namespace std;
 
 static const std::string HELP = "help";
@@ -64,65 +67,21 @@ static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA
 static const std::string exampleArg9 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 static const std::string exampleArg10 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
-void outputString(const std::string str) {
-    Logger::log(str);
-}
 
-void outputExtKeys(KeyTree& keyTree) {
-    while (! keyTree.isAtEndOfChain()) {
-        KeyNode data = keyTree.getNextInChain();
-        outputString("* [Chain " + data.chain + "]");
-        outputString("  * ext pub: " + data.extpub);
-        if (data.extprv != "") outputString("  * ext prv: " + data.extprv);
-    }
-}
+void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat);
+void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr);
+void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, uint32_t i_max = 9);
+void outputKeyAddressofExtKey(const std::string extKey);
+void outputString(const std::string str);
+static void setTestNet(bool enabled);
+void outputExtKeys(KeyNode& keyNode, std::vector<uint32_t> chain);
+static std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivate = true);
+static std::string iToString(uint32_t i);
+uchar_vector extKeyBase58OrHexToBytes(const std::string extKey);
+static uchar_vector fromBase58ExtKey(const std::string extKey);
+static inline uint32_t toPrime(uint32_t i) { return 0x80000000 | i; }
+static inline bool isPrime(uint32_t i) { return 0x80000000 & i; }
 
-void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
-    std::string seedHex;
-    if (seedStringFormat == StringUtils::ascii) {
-        seedHex = StringUtils::string_to_hex(seed);
-        
-    } else if (seedStringFormat == StringUtils::hex) {
-        if (! StringUtils::isHex(seed))
-        throw std::runtime_error("Invalid hex string \"" + seed + "\"");
-        
-        seedHex = seed;
-    } else throw std::runtime_error("Invalid seed string format.");
-    
-    
-    KeyTree keyTree(seed, chainStr, seedStringFormat);
-    KeyNode data = keyTree.getCurrentInChain();
-    outputString("Master (hex): " + seedHex);
-    outputString("* [Chain " + data.chain + "]");
-    outputString("  * ext pub: " + data.extpub);
-    outputString("  * ext prv: " + data.extprv);
-    outputExtKeys(keyTree);
-}
-
-void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr) {
-    KeyTree keyTree(extKey, chainStr);
-    outputExtKeys(keyTree);
-}
-
-void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min = 0, uint32_t i_max = 9) {
-    for (uint32_t i = i_min; i < i_max; i++ ) {
-        KeyNode data = KeyTree::getChildOfExtKey(extKey, i);
-        if (data.privkey != "") outputString("  * priv key: " + data.privkey);
-        outputString("  * address: " + data.address);
-        outputString("");
-    }
-}
-
-void outputKeyAddressofExtKey(const std::string extKey) {
-    KeyTree keyTree(extKey, "m");
-    KeyNode data = keyTree.getCurrentInChain();
-    //outputString("* [Chain " + data.chain + "]");
-    outputString("  * ext pub: " + data.extpub);
-    if (data.extprv != "") outputString("  * ext prv: " + data.extprv);
-    if (data.privkey != "") outputString("  * priv key: " + data.privkey);
-    outputString("  * address: " + data.address);
-    outputString("");
-}
 
 void testVector1() {
     outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
@@ -226,10 +185,12 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         
         outputExtKeysFromSeed(seed, chain, seed_format);
     } else if (argsDict[EXTENDEDKEY] != "" && argsDict[CHAIN] != "") {
+
         std::string extkey = argsDict[EXTENDEDKEY];
         std::string chain = argsDict[CHAIN];
         outputExtKeysFromExtKey(extkey, chain);
     } else if (argsDict[EXTENDEDKEY] != "" && argsDict[I_MIN] != "" && argsDict[I_MAX] != "") {
+
         std::string extkey = argsDict[EXTENDEDKEY];
         uint32_t i_min = std::stoi(argsDict[I_MIN]);
         uint32_t i_max = std::stoi(argsDict[I_MAX]);
@@ -248,7 +209,8 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
 
 int main(int argc, const char * argv[]) {
     Logger::setLogLevelError();
-    //KeyTree::setTestNet(true);
+    Logger::setLogLevelDebug();
+    //setTestNet(true);
 
     //testVector1();
     //testVector2();
@@ -265,5 +227,157 @@ int main(int argc, const char * argv[]) {
     catch (const std::runtime_error& err) {
         outputString("Error: " + std::string(err.what()));
     }
+}
+
+
+
+void outputString(const std::string str) {
+    Logger::log(str);
+}
+
+uchar_vector extKeyBase58OrHexToBytes(const std::string extKey) {
+    uchar_vector extendedKey;
+    if (isBase58CheckValid(extKey))
+        extendedKey = fromBase58ExtKey(extKey);
+    else if (StringUtils::isHex(extKey))
+        extendedKey = uchar_vector(extKey);
+    else
+        throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
+    
+    return extendedKey;
+}
+
+void outputExtKeys(KeyNode& keyNode, std::vector<uint32_t> chain) {
+    stringstream chainname;
+    chainname << "m";
+    for(auto it=chain.begin(); it!=chain.end(); ++it) {
+        uint32_t k = *it;
+        chainname << "/" << iToString(k);
+        outputString("* [Chain " + chainname.str() + "]");
+        
+        keyNode = keyNode.getChild(k);
+        if (keyNode.isPrivate()) {
+            KeyNode keyNodePub= keyNode.getPublic();
+            outputString("  * ext pub: " + toBase58Check(keyNodePub.extkey()));
+            outputString("  * ext prv: " + toBase58Check(keyNode.extkey()));
+            //outputString("  * priv key: " + keyNode.privkey());
+            //outputString("  * address: " + keyNode.address());
+        } else {
+            outputString("  * ext pub: " + toBase58Check(keyNode.extkey()));
+            //outputString("  * address: " + keyNode.address());
+        }
+    }
+}
+
+void outputExtKeysFromSeed(const std::string seed, const std::string chainStr, StringUtils::StringFormat seedStringFormat) {
+    std::string seedHex;
+    if (seedStringFormat == StringUtils::ascii) {
+        seedHex = StringUtils::string_to_hex(seed);
+        
+    } else if (seedStringFormat == StringUtils::hex) {
+        if (! StringUtils::isHex(seed))
+            throw std::runtime_error("Invalid hex string \"" + seed + "\"");
+        
+        seedHex = seed;
+    } else throw std::runtime_error("Invalid seed string format.");
+    
+    KeyNodeSeed keyNodeSeed((uchar_vector(seedHex)));
+    bytes_t k = keyNodeSeed.getMasterKey();
+    bytes_t c = keyNodeSeed.getMasterChainCode();
+    KeyNode prv(k, c);
+    KeyNode pub = prv.getPublic();
+    outputString("Master (hex): " + seedHex);
+    outputString("* [Chain m]");
+    outputString("  * ext pub: " + toBase58Check(pub.extkey()));
+    outputString("  * ext prv: " + toBase58Check(prv.extkey()));
+    std::vector<uint32_t> chain = parseChainString(chainStr, prv.isPrivate());
+    outputExtKeys(prv, chain);
+}
+
+void outputExtKeysFromExtKey(const std::string extKey, const std::string chainStr) {
+    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
+    KeyNode keyNode(extendedKey);
+    std::vector<uint32_t> chain = parseChainString(chainStr, keyNode.isPrivate());
+    outputExtKeys(keyNode, chain);
+}
+
+void outputKeyAddressesFromExtKey(const std::string extKey, uint32_t i_min, uint32_t i_max) {
+    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
+    
+    KeyNode keyNode(extendedKey);
+    for (uint32_t i = i_min; i < i_max; i++ ) {
+        KeyNode child = keyNode.getChild(i);
+        if (child.isPrivate()) outputString("  * priv key: " + child.privkey());
+        outputString("  * address: " + child.address());
+        outputString("");
+    }
+}
+
+void outputKeyAddressofExtKey(const std::string extKey) {
+    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
+    
+    KeyNode keyNode(extendedKey);
+    if (keyNode.isPrivate()) {
+        KeyNode keyNodePub= keyNode.getPublic();
+        outputString("  * ext pub: " + toBase58Check(keyNodePub.extkey()));
+        outputString("  * ext prv: " + toBase58Check(keyNode.extkey()));
+        outputString("  * priv key: " + keyNode.privkey());
+        outputString("  * address: " + keyNodePub.address());
+    } else {
+        outputString("  * ext pub: " + toBase58Check(keyNode.extkey()));
+        outputString("  * address: " + keyNode.address());
+    }
+    outputString("");
+}
+
+
+uchar_vector fromBase58ExtKey(const std::string extKey) {
+    static unsigned int dummy = 0;
+    uchar_vector fillKey;
+    fromBase58Check(extKey, fillKey, dummy);
+    static const std::string VERSION_BYTE("04");
+    return uchar_vector(VERSION_BYTE+fillKey.getHex()); //append VERSION_BYTE to begining
+}
+
+std::vector<uint32_t> parseChainString(const std::string chainStr, bool isPrivate) {
+    std::vector<uint32_t> chain;
+    
+    const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
+    
+    std::vector<std::string> splitChain = StringUtils::split(s, '/');
+    
+    if (splitChain[0] != "m")
+        throw std::runtime_error("Invalid Chain string.");
+    
+    if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
+    
+    for(auto it=splitChain.begin()+1; it!=splitChain.end(); ++it) {
+        std::string node = *it;
+        
+        if (node.back() == '\'') {
+            if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
+            
+            node = node.substr(0,node.length()-1);
+            uint32_t num = std::stoi(node);
+            chain.push_back(toPrime(num));
+        } else {
+            uint32_t num = std::stoi(node);
+            chain.push_back(num);
+        }
+    }
+    
+    return chain;
+}
+
+void setTestNet(bool enabled) {
+    if (enabled) Coin::HDKeychain::setVersions(0x04358394, 0x043587CF);
+    else Coin::HDKeychain::setVersions(0x0488ADE4, 0x0488B21E);
+}
+
+std::string iToString(uint32_t i) {
+    std::stringstream ss;
+    ss << (0x7fffffff & i);
+    if (isPrime(i)) { ss << "'"; }
+    return ss.str();
 }
 
