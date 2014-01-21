@@ -39,8 +39,8 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt -extkey xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw
 
 ###### It is also possible to have multiple chain paths:
-    ./kt -seed.hex "000102030405060708090a0b0c0d0e0f" -chain "m/0'/(5-8)'"
-    ./kt -extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -chain "m/0'/(3-6)'/(1-2)/8"
+    ./kt -seed.hex "000102030405060708090a0b0c0d0e0f" -chain "m/0'/(3-6)'/(1-2)/8"
+    ./kt -extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -chain "m/0'/(5-8)'"
 
 ##### For more on how to use KeyTree do:
     $./kt -help
