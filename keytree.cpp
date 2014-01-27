@@ -132,7 +132,6 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         if (arg[0] != '-')
         throw std::invalid_argument("Invalid arguments.");
         
-        
         arg = arg.substr(1);
         if (arg == HELP) {
             argsDict[HELP] = HELP;
@@ -164,7 +163,6 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         } else {
             throw std::invalid_argument("Invalid arguments.");
         }
-        //Logger::debug("arg: " + arg);
     }
     
     return argsDict;
@@ -492,24 +490,18 @@ TreeChains parseChainString(const std::string& chainStr, bool isPrivate) {
             if (node.front() == '(' && node.back() == ')') {
                 IsPrivateNPathRange range = parseRange(node, true);
                 treeChains.push_back(range);
-                Logger::info("_____min:"+ std::to_string(range.second.first) + "max:"+ std::to_string(range.second.second));
             } else {
                 uint32_t num = toPrime(std::stoi(node));
                 treeChains.push_back(IsPrivateNPathRange(true , Range(num, num)));
-                Logger::info("_____min:"+ node);
             }
         } else {
             if (node.front() == '(' && node.back() == ')') {
                 IsPrivateNPathRange range = parseRange(node, false);
                 treeChains.push_back(range);
-                Logger::info("_____min:"+ std::to_string(range.second.first) + "max:"+ std::to_string(range.second.second));
             } else {
                 uint32_t num = std::stoi(node);
                 treeChains.push_back(IsPrivateNPathRange(false , Range(num, num)));
-                Logger::info("_____min:"+ node);
             }
-            
-            
         }
     }
     

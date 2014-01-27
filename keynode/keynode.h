@@ -41,7 +41,7 @@ public:
     KeyNode() {}
     KeyNode(const bytes_t& key, const bytes_t& chain_code, uint32_t child_num = 0, uint32_t parent_fp = 0, uint32_t depth = 0);
     KeyNode(const bytes_t& extkey);
-    KeyNode( const KeyNode& other );
+    KeyNode(const KeyNode& other);
     KeyNode getChild(uint32_t i) const;
     KeyNode getPublic() const;
     std::string address() const;
