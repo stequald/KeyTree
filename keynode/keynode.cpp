@@ -31,6 +31,19 @@ KeyNode::KeyNode(const bytes_t& key, const bytes_t& chain_code, uint32_t child_n
 
 KeyNode::KeyNode(const bytes_t& extkey) : Coin::HDKeychain(extkey) {}
 
+KeyNode::KeyNode( const KeyNode& other ) {
+    valid_ = other.valid_;
+    if (!valid_) return;
+    
+    version_ = other.version_;
+    depth_ = other.depth_;
+    parent_fp_ = other.parent_fp_;
+    child_num_ = other.child_num_;
+    chain_code_ = other.chain_code_;
+    key_ = other.key_;
+    Coin::HDKeychain::updatePubkey();
+}
+
 KeyNode KeyNode::getChild(uint32_t i) const {
     KeyNode ret(Coin::HDKeychain::getChild(i).extkey());
     return ret;

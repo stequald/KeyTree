@@ -96,7 +96,7 @@ namespace Coin {
         
         std::string toString() const;
         
-    private:
+    protected:
         static uint32_t priv_version_;
         static uint32_t pub_version_;
         
