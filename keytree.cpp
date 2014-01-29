@@ -44,8 +44,6 @@ static const std::string SEED = "seed";
 static const std::string SEED_HEX = "seed.hex";
 static const std::string EXTENDEDKEY = "extkey";
 static const std::string CHAIN = "chain";
-static const std::string I_MIN = "imin";
-static const std::string I_MAX = "imax";
 static const std::string TREE_TRAVERSAL_OPTION = "traverse";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "preorder";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "postorder";
@@ -59,8 +57,6 @@ static const std::string SEED_SHORT_HEX = "s.hex";
 
 static const std::string EXTENDEDKEY_SHORT = "ek";
 static const std::string CHAIN_SHORT = "c";
-static const std::string I_MIN_SHORT = "min";
-static const std::string I_MAX_SHORT = "max";
 static const std::string TREE_TRAVERSAL_OPTION_SHORT = "trav";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER_SHORT = "pre";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER_SHORT = "post";
@@ -74,20 +70,18 @@ static const std::string exampleArg3 = " -s.hex 000102030405060708090a0b0c0d0e0f
 static const std::string exampleArg4 = " -s.h 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
 static const std::string exampleArg5 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -c \"m/0'/0\"";
 static const std::string exampleArg6 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/0\"";
-static const std::string exampleArg7 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -imin 0 -imax 3";
-static const std::string exampleArg8 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -min 0 -max 3";
 
-static const std::string exampleArg9 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
-static const std::string exampleArg10 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
+static const std::string exampleArg7 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
+static const std::string exampleArg8 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
-static const std::string exampleArg11 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
-static const std::string exampleArg12 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -chain \"m/0'/(5-8)'\"";
+static const std::string exampleArg9 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
+static const std::string exampleArg10 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -chain \"m/0'/(5-8)'\"";
 
-static const std::string exampleArg13 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/(3-4)/(1-2)\" -traverse levelorder";
-static const std::string exampleArg14 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\" -trav postorder";
+static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/(3-4)/(1-2)\" -traverse levelorder";
+static const std::string exampleArg12 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\" -trav postorder";
 
-static const std::string exampleArg15 = " -verbose -s.h \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\"";
-static const std::string exampleArg16 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
+static const std::string exampleArg13 = " -verbose -s.h \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\"";
+static const std::string exampleArg14 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 
 namespace TreeTraversal {
     enum Type {
@@ -102,7 +96,6 @@ static const TreeTraversal::Type defaultTreeTraversalType = TreeTraversal::preor
 
 void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr, StringUtils::StringFormat seedStringFormat, TreeTraversal::Type traversalType = defaultTreeTraversalType, const bool isVerbose = false);
 void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr, TreeTraversal::Type traversalType = defaultTreeTraversalType, const bool isVerbose = false);
-void outputKeyAddressesFromExtKey(const std::string& extKey, uint32_t i_min = 0, uint32_t i_max = 9, const bool isVerbose = false);
 void outputKeyAddressofExtKey(const std::string& extKey, const bool isVerbose = false);
 void outputString(const std::string& str);
 void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName, const bool isVerbose = false);
@@ -159,12 +152,6 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         } else if(arg == CHAIN || arg == CHAIN_SHORT) {
             ++it;
             argsDict[CHAIN] = *it;
-        } else if(arg == I_MIN || arg == I_MIN_SHORT) {
-            ++it;
-            argsDict[I_MIN] = *it;
-        } else if(arg == I_MAX || arg == I_MAX_SHORT) {
-            ++it;
-            argsDict[I_MAX] = *it;
         } else if(arg == TREE_TRAVERSAL_OPTION || arg == TREE_TRAVERSAL_OPTION_SHORT) {
             ++it;
             argsDict[TREE_TRAVERSAL_OPTION] = *it;
@@ -195,29 +182,24 @@ void outputExamples() {
     outputString(cmdName+exampleArg6);
     outputString("");
     
-    outputString("Given Extended Key and range will output Private Keys and Addresses from child of Extended Key in given range:");
+    outputString("Given Extended Key will output Private Key and Address of Extended Key:");
     outputString(cmdName+exampleArg7);
     outputString(cmdName+exampleArg8);
     outputString("");
-    
-    outputString("Given Extended Key will output Private Key and Address of Extended Key:");
+
+    outputString("It is also possible to have multiple chain paths:");
     outputString(cmdName+exampleArg9);
     outputString(cmdName+exampleArg10);
     outputString("");
 
-    outputString("It is also possible to have multiple chain paths:");
+    outputString("It is also possible to output the Extended Keys in a different order:");
     outputString(cmdName+exampleArg11);
     outputString(cmdName+exampleArg12);
     outputString("");
 
-    outputString("It is also possible to output the Extended Keys in a different order:");
+    outputString("For more info on nodes use the verbose option:");
     outputString(cmdName+exampleArg13);
     outputString(cmdName+exampleArg14);
-    outputString("");
-
-    outputString("For more info on nodes use the verbose option:");
-    outputString(cmdName+exampleArg15);
-    outputString(cmdName+exampleArg16);
 }
 
 TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption) {
@@ -268,13 +250,6 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         outputExtKeysFromExtKey(extkey, chain, traverseType, isVerbose);
-    } else if (argsDict[EXTENDEDKEY] != "" && argsDict[I_MIN] != "" && argsDict[I_MAX] != "") {
-
-        std::string extkey = argsDict[EXTENDEDKEY];
-        uint32_t i_min = std::stoi(argsDict[I_MIN]);
-        uint32_t i_max = std::stoi(argsDict[I_MAX]);
-        bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
-        outputKeyAddressesFromExtKey(extkey, i_min, i_max, isVerbose);
     } else if (argsDict[EXTENDEDKEY] != "") {
         std::string extkey = argsDict[EXTENDEDKEY];
         bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
@@ -332,16 +307,16 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVe
         KeyNode keyNodePub= keyNode.getPublic();
         outputString("  * ext pub:  " + toBase58Check(keyNodePub.extkey()));
         outputString("  * ext prv:  " + toBase58Check(keyNode.extkey()));
+        outputString("  * priv key: " + keyNode.privkey());
+        outputString("  * address:  " + keyNode.address());
         if (isVerbose) {
-            outputString("  * priv key: " + keyNode.privkey());
             outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
-            outputString("  * address:  " + keyNode.address());
         }
     } else {
         outputString("  * ext pub:  " + toBase58Check(keyNode.extkey()));
+        outputString("  * address:  " + keyNode.address());
         if (isVerbose) {
             outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
-            outputString("  * address:  " + keyNode.address());
         }
     }
 }
@@ -494,21 +469,10 @@ void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chain
         traversePreorder(keyNode, treeChains, "___", isVerbose);
 }
 
-void outputKeyAddressesFromExtKey(const std::string& extKey, uint32_t i_min, uint32_t i_max, const bool isVerbose) {
-    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
-    KeyNode keyNode(extendedKey);
-    for (uint32_t i = i_min; i < i_max; i++ ) {
-        KeyNode child = keyNode.getChild(i);
-        if (child.isPrivate()) outputString("  * priv key: " + child.privkey());
-        outputString("  * address: " + child.address());
-        outputString("");
-    }
-}
-
 void outputKeyAddressofExtKey(const std::string& extKey, const bool isVerbose) {
     uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    visit(keyNode, "___", true);
+    visit(keyNode, "___", isVerbose);
     if (isVerbose) outputExtraKeyNodeData(keyNode);
     outputString("");
 }
