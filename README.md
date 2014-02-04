@@ -17,6 +17,14 @@ However, deterministic wallets typically consist of a single "chain" of keypairs
 
 [https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki]:https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 
+Purpose
+===========
+KeyTree is meant to be a program that lets users have the full flexibility and features of HDWallets available to them at their fingertips. KeyTree is meant to do one thing and do it well. It is meant to be a small program with minimal amount of code such that it is easily audible. The only dependency is OpenSSL. Thus it is easy to build and run on a freshly installed offline operating system, since OpenSSL usually comes pre-install in most popular Unix-like operating systems.
+
+Though KeyTree  is an implementation of HDWallets, it is not to be confused with services like [BlockChain’s My Wallet](https://blockchain.info/wallet) or [Armory](https://bitcoinarmory.com/). KeyTree is a bitcoin key generater and manager. KeyTree does not generate transactions or send them. It is  meant to be used on an airgap, offline computer to generate keys.
+
+There are other tools that have HDWallet implementations, but their purposes are different. For example, [sx](https://github.com/spesmilo/sx) is more of a general purpose Bitcoin command-line tool for power users and [Electrum](https://github.com/spesmilo/electrum) uses it to enumerate accounts derived from a seed with the scheme m/0’/n/.
+
 
 #### How to use:
 
