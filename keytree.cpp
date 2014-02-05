@@ -415,11 +415,11 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
     bytes_t k = keyNodeSeed.getMasterKey();
     bytes_t c = keyNodeSeed.getMasterChainCode();
 
-    outputString("Master (hex): " + seedHex);
     KeyNode prv(k, c);
+    TreeChains treeChains = parseChainString(chainStr, prv.isPrivate());
+    outputString("Master (hex): " + seedHex);
     visit(prv, "m", isVerbose);
     
-    TreeChains treeChains = parseChainString(chainStr, prv.isPrivate());
     if (traversalType == TreeTraversal::postorder)
         traversePostorder(prv, treeChains, "m", isVerbose);
     else if (traversalType == TreeTraversal::levelorder) {
