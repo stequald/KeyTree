@@ -49,9 +49,9 @@ public:
     static void setTestNet(bool enabled);
 private:
     static std::string secretToASecret(const uchar_vector& secret, bool compressed = false);
-    static std::string public_key_to_bc_address(const uchar_vector& public_key);
-    static uchar_vector hash_160(const uchar_vector& public_key);
-    static std::string hash_160_to_bc_address(const uchar_vector& h160, int addrtype = 0);
+    static std::string publicKeyToAddress(const uchar_vector& public_key);
+    static uchar_vector hash160(const uchar_vector& public_key);
+    static std::string hash160ToAddress(const uchar_vector& h160, int addrtype = 0);
     static std::string encodeBase58Check(const uchar_vector& vchIn);
 };
 

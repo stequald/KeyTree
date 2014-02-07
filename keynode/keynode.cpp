@@ -65,19 +65,19 @@ std::string KeyNode::privkey() const {
 
 std::string KeyNode::address() const {
     uchar_vector K = this->pubkey();
-    return KeyNode::public_key_to_bc_address(K);
+    return KeyNode::publicKeyToAddress(K);
 }
 
-uchar_vector KeyNode::hash_160(const uchar_vector& public_key) {
+uchar_vector KeyNode::hash160(const uchar_vector& public_key) {
     return mdsha(public_key);
 }
 
-std::string KeyNode::public_key_to_bc_address(const uchar_vector& public_key) {
-    uchar_vector h160 = KeyNode::hash_160(public_key);
-    return KeyNode::hash_160_to_bc_address(h160);
+std::string KeyNode::publicKeyToAddress(const uchar_vector& public_key) {
+    uchar_vector h160 = KeyNode::hash160(public_key);
+    return KeyNode::hash160ToAddress(h160);
 }
 
-std::string KeyNode::hash_160_to_bc_address(const uchar_vector& h160, int addrtype) {
+std::string KeyNode::hash160ToAddress(const uchar_vector& h160, int addrtype) {
     uchar_vector vh160;
     vh160.push_back((unsigned char)addrtype);
     vh160 += h160;
