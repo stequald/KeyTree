@@ -223,8 +223,8 @@ bool getIsVerbose(std::string verboseOption) {
 
 int handle_arguments(std::map<std::string, std::string> argsDict) {
     Logger::debug("Arguments:");
-    for (auto it = argsDict.begin(); it != argsDict.end(); ++it) {
-        Logger::debug("\tkey: " + it->first + " value: " + it->second);
+    for (auto arg : argsDict) {
+        Logger::debug("\tkey: " + arg.first + " value: " + arg.second);
     }
     Logger::debug("");
     if (argsDict[HELP] == HELP) {
@@ -492,15 +492,14 @@ TreeChains parseChainString(const std::string& chainStr, bool isPrivate) {
     
     const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
     
-    std::vector<std::string> splitChain = StringUtils::split(s, '/');
+    std::deque<std::string> splitChain = StringUtils::split(s, '/');
     
     if (splitChain[0] != "m")
         throw std::runtime_error("Invalid Chain string.");
     
     if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
-    
-    for(auto it=splitChain.begin()+1; it!=splitChain.end(); ++it) {
-        std::string node = *it;
+    splitChain.pop_front();
+    for (std::string& node : splitChain) {
         if (node.back() == '\'') {
             if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
             
@@ -529,7 +528,7 @@ TreeChains parseChainString(const std::string& chainStr, bool isPrivate) {
 IsPrivateNPathRange parseRange(const std::string node, bool isPrivate) {
     //node must be like (123-9345)
     const std::string minMaxString =  node.substr(1,node.length()-2);
-    const std::vector<std::string> minMaxPair = StringUtils::split(minMaxString, '-');
+    const std::deque<std::string> minMaxPair = StringUtils::split(minMaxString, '-');
     
     if (minMaxPair.size() != 2)
         throw std::invalid_argument("Invalid arguments.");
