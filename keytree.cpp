@@ -31,11 +31,10 @@
 #include "keynode/keynode.h"
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
+#include "typedefs.h"
+#include "keytreeutil.h"
 
 using namespace std;
-typedef std::pair<uint32_t,uint32_t> Range;
-typedef std::pair<bool,Range> IsPrivateNPathRange; // < isPrivate, <min,max> >
-typedef std::deque<IsPrivateNPathRange> TreeChains;
 
 static const std::string HELP = "-help";
 static const std::string SEED_FORMAT = "seed_format";
@@ -92,7 +91,6 @@ namespace TreeTraversal {
 }
 
 static const TreeTraversal::Type defaultTreeTraversalType = TreeTraversal::preorder;
-static const uint32_t NODE_IDX_M = -1;
 
 
 void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr, StringUtils::StringFormat seedStringFormat, TreeTraversal::Type traversalType = defaultTreeTraversalType, const bool isVerbose = false);
@@ -107,14 +105,7 @@ void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, co
                         bool isVerbose = false);
 void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVerbose = false);
 void outputExtraKeyNodeData(const KeyNode& keyNode);
-static TreeChains parseChainString(const std::string& chainStr, bool isPrivate = true);
-static std::string iToString(uint32_t i);
-static uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey);
-static uchar_vector fromBase58ExtKey(const std::string& extKey);
-static inline uint32_t toPrime(uint32_t i) { return 0x80000000 | i; }
-static inline uint32_t removePrime(uint32_t i) { return 0x7fffffff & i; }
-static inline bool isPrime(uint32_t i) { return 0x80000000 & i; }
-static IsPrivateNPathRange parseRange(const std::string node, bool isPrivate);
+
 
 void testVector1() {
     outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
@@ -288,20 +279,6 @@ int main(int argc, const char * argv[]) {
     }
 }
 
-
-
-uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey) {
-    uchar_vector extendedKey;
-    if (isBase58CheckValid(extKey))
-        extendedKey = fromBase58ExtKey(extKey);
-    else if (StringUtils::isHex(extKey))
-        extendedKey = uchar_vector(extKey);
-    else
-        throw std::runtime_error("Invalid extended key. Extended key must be in base58 or hex form.");
-    
-    return extendedKey;
-}
-
 void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVerbose) {
     outputString("* [Chain " + chainName + "]");
     if (keyNode.isPrivate()) {
@@ -336,8 +313,8 @@ void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, co
         level++;
         for (uint32_t i = min; i <= max; ++i) {
             uint32_t k = i;
-            if (isPrivate) k = toPrime(k);
-            std::string childChainName = chainName + "/" + iToString(k);
+            if (isPrivate) k = KeyTreeUtil::toPrime(k);
+            std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
             KeyNode childNode = keyNode.getChild(k);
     
             keyNodeDeq.push_back(childNode);
@@ -367,14 +344,14 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
         uint32_t min = range.first;
         uint32_t max = range.second;
         
-        if (min == NODE_IDX_M && max == NODE_IDX_M) {
+        if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
             visit(keyNode, "m", isVerbose);
             traversePreorder(keyNode, treeChains, chainName, isVerbose);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
                 uint32_t k = i;
-                if (isPrivate) k = toPrime(k);
-                std::string childChainName = chainName + "/" + iToString(k);
+                if (isPrivate) k = KeyTreeUtil::toPrime(k);
+                std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);
                 visit(childNode, childChainName, isVerbose);
                 traversePreorder(childNode, treeChains, childChainName, isVerbose);
@@ -392,14 +369,14 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
         uint32_t min = range.first;
         uint32_t max = range.second;
         
-        if (min == NODE_IDX_M && max == NODE_IDX_M) {
+        if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
             traversePostorder(keyNode, treeChains, chainName, isVerbose);
             visit(keyNode, "m", isVerbose);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
                 uint32_t k = i;
-                if (isPrivate) k = toPrime(k);
-                std::string childChainName = chainName + "/" + iToString(k);
+                if (isPrivate) k = KeyTreeUtil::toPrime(k);
+                std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);
                 traversePostorder(childNode, treeChains, childChainName, isVerbose);
                 visit(childNode, childChainName, isVerbose);
@@ -427,7 +404,7 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
     bytes_t c = keyNodeSeed.getMasterChainCode();
 
     KeyNode prv(k, c);
-    TreeChains treeChains = parseChainString(chainStr, prv.isPrivate());
+    TreeChains treeChains = KeyTreeUtil::parseChainString(chainStr, prv.isPrivate());
     outputString("Master (hex): " + seedHex);
     
     if (traversalType == TreeTraversal::postorder)
@@ -445,8 +422,8 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
 void outputExtraKeyNodeData(const KeyNode& keyNode) {
     outputString("  * depth:              " + std::to_string(keyNode.depth()));
     uint32_t childNum = keyNode.child_num();
-    if (isPrime(childNum))
-        outputString("  * child number:       " + std::to_string(removePrime(childNum))+"'");
+    if (KeyTreeUtil::isPrime(childNum))
+        outputString("  * child number:       " + std::to_string(KeyTreeUtil::removePrime(childNum))+"'");
     else
         outputString("  * child number:       " + std::to_string(childNum));
     std::stringstream stream;
@@ -461,9 +438,9 @@ void outputExtraKeyNodeData(const KeyNode& keyNode) {
 
 void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr,
                              TreeTraversal::Type traversalType, const bool isVerbose) {
-    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
+    uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    TreeChains treeChains = parseChainString(chainStr, keyNode.isPrivate());
+    TreeChains treeChains = KeyTreeUtil::parseChainString(chainStr, keyNode.isPrivate());
     
     if (isVerbose) outputExtraKeyNodeData(keyNode);
 
@@ -479,92 +456,10 @@ void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chain
 }
 
 void outputKeyAddressofExtKey(const std::string& extKey, const bool isVerbose) {
-    uchar_vector extendedKey(extKeyBase58OrHexToBytes(extKey));
+    uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
     visit(keyNode, "___", isVerbose);
     if (isVerbose) outputExtraKeyNodeData(keyNode);
     outputString("");
 }
 
-
-uchar_vector fromBase58ExtKey(const std::string& extKey) {
-    static unsigned int dummy = 0;
-    uchar_vector fillKey;
-    fromBase58Check(extKey, fillKey, dummy);
-    static const std::string VERSION_BYTE("04");
-    return uchar_vector(VERSION_BYTE+fillKey.getHex()); //append VERSION_BYTE to begining
-}
-
-TreeChains parseChainString(const std::string& chainStr, bool isPrivate) {
-    TreeChains treeChains;
-    
-    const std::string s = StringUtils::split(chainStr)[0]; //trim trailing whitespaces
-    
-    std::deque<std::string> splitChain = StringUtils::split(s, '/');
-    
-    if (splitChain[0] != "m")
-        throw std::runtime_error("Invalid Chain string.");
-    
-    //account for root node
-    treeChains.push_back(IsPrivateNPathRange(true , Range(NODE_IDX_M, NODE_IDX_M)));
-
-    if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
-    splitChain.pop_front();
-    for (std::string& node : splitChain) {
-        if (node.back() == '\'') {
-            if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
-            
-            node = node.substr(0,node.length()-1);
-            if (node.front() == '(' && node.back() == ')') {
-                IsPrivateNPathRange range = parseRange(node, true);
-                treeChains.push_back(range);
-            } else {
-                uint32_t num = toPrime(std::stoi(node));
-                if (num == NODE_IDX_M)
-                    throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(num));
-                treeChains.push_back(IsPrivateNPathRange(true , Range(num, num)));
-            }
-        } else {
-            if (node.front() == '(' && node.back() == ')') {
-                IsPrivateNPathRange range = parseRange(node, false);
-                treeChains.push_back(range);
-            } else {
-                uint32_t num = std::stoi(node);
-                if (num == NODE_IDX_M)
-                    throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(num));
-                treeChains.push_back(IsPrivateNPathRange(false , Range(num, num)));
-            }
-        }
-    }
-    
-    return treeChains;
-}
-
-IsPrivateNPathRange parseRange(const std::string node, bool isPrivate) {
-    //node must be like (123-9345)
-    const std::string minMaxString =  node.substr(1,node.length()-2);
-    const std::deque<std::string> minMaxPair = StringUtils::split(minMaxString, '-');
-    
-    if (minMaxPair.size() != 2)
-        throw std::invalid_argument("Invalid arguments.");
-
-    uint32_t min = std::stoi(minMaxPair[0]);
-    uint32_t max = std::stoi(minMaxPair[1]);
-    if (min == NODE_IDX_M)
-        throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(min));
-    if (max == NODE_IDX_M)
-        throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(max));
-
-    if (isPrivate) {
-        return IsPrivateNPathRange(true, Range(min, max));
-    } else {
-        return IsPrivateNPathRange(false, Range(min, max));
-    }
-}
-
-std::string iToString(uint32_t i) {
-    std::stringstream ss;
-    ss << (0x7fffffff & i);
-    if (isPrime(i)) { ss << "'"; }
-    return ss.str();
-}
