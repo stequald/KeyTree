@@ -13,8 +13,11 @@ HEADERS = \
     $(COINCLASSESSRCDIR)/uchar_vector.h
 
 
-kt: keytree.cpp keynode.o logger.o hdkeys.o
-	$(CXX) $(CXXFLAGS) -o $@ $< keynode.o logger.o hdkeys.o -lcrypto
+kt: keytree.cpp keynode.o logger.o hdkeys.o keytreeutil.o typedefs.h
+	$(CXX) $(CXXFLAGS) -o $@ $< keynode.o logger.o hdkeys.o keytreeutil.o -lcrypto
+
+keytreeutil.o: keytreeutil.cpp
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 keynode.o: $(KEYNODESRCDIR)/keynode.cpp $(COINCLASSESSRCDIR)/Base58Check.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
