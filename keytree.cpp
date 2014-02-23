@@ -31,7 +31,6 @@
 #include "keynode/keynode.h"
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
-#include "typedefs.h"
 #include "keytreeutil.h"
 
 using namespace std;
@@ -81,14 +80,6 @@ static const std::string exampleArg12 = " --seed.hex \"000102030405060708090a0b0
 
 static const std::string exampleArg13 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
 static const std::string exampleArg14 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
-
-namespace TreeTraversal {
-    enum Type {
-        preorder,
-        postorder,
-        levelorder
-    };
-}
 
 static const TreeTraversal::Type defaultTreeTraversalType = TreeTraversal::preorder;
 

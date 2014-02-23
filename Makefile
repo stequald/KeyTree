@@ -13,7 +13,7 @@ HEADERS = \
     $(COINCLASSESSRCDIR)/uchar_vector.h
 
 
-kt: keytree.cpp keynode.o logger.o hdkeys.o keytreeutil.o typedefs.h
+kt: keytree.cpp keynode.o logger.o hdkeys.o keytreeutil.o
 	$(CXX) $(CXXFLAGS) -o $@ $< keynode.o logger.o hdkeys.o keytreeutil.o -lcrypto
 
 keytreeutil.o: keytreeutil.cpp

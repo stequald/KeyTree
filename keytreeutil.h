@@ -25,13 +25,23 @@
 #ifndef KEYTREE_KEYTREEUTIL_H
 #define KEYTREE_KEYTREEUTIL_H
 
-#include "typedefs.h"
 #include "keynode/keynode.h"
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
+#include <deque>
 
-/** Utility functions used by the KeyTree.
- */
+typedef std::pair<uint32_t,uint32_t> Range;
+typedef std::pair<bool,Range> IsPrivateNPathRange; // < isPrivate, <min,max> >
+typedef std::deque<IsPrivateNPathRange> TreeChains;
+
+namespace TreeTraversal {
+    enum Type {
+        preorder,
+        postorder,
+        levelorder
+    };
+}
+
 namespace KeyTreeUtil
 {
     const uint32_t NODE_IDX_M = -1;
