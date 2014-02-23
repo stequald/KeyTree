@@ -37,18 +37,18 @@ typedef std::pair<uint32_t,uint32_t> Range;
 typedef std::pair<bool,Range> IsPrivateNPathRange; // < isPrivate, <min,max> >
 typedef std::deque<IsPrivateNPathRange> TreeChains;
 
-static const std::string HELP = "help";
+static const std::string HELP = "-help";
 static const std::string SEED_FORMAT = "seed_format";
 
-static const std::string SEED = "seed";
-static const std::string SEED_HEX = "seed.hex";
-static const std::string EXTENDEDKEY = "extkey";
-static const std::string CHAIN = "chain";
-static const std::string TREE_TRAVERSAL_OPTION = "traverse";
-static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "preorder";
-static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "postorder";
-static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "levelorder";
-static const std::string VERBOSE_OPTION = "verbose";
+static const std::string SEED = "-seed";
+static const std::string SEED_HEX = "-seed.hex";
+static const std::string EXTENDEDKEY = "-extkey";
+static const std::string CHAIN = "-chain";
+static const std::string TREE_TRAVERSAL_OPTION = "-traverse";
+static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "-preorder";
+static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "-postorder";
+static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "-levelorder";
+static const std::string VERBOSE_OPTION = "-verbose";
 
 static const std::string SEED_SHORT = "s";
 static const std::string SEED_SHORT_HEX_SHORT = "s.h";
@@ -64,23 +64,23 @@ static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER_SHORT = "lev";
 static const std::string VERBOSE_OPTION_SHORT = "v";
 
 static const std::string cmdName = "./kt";
-static const std::string exampleArg1 = " -seed \"correct horse battery staple\" -chain \"m/0'/0\"";
-static const std::string exampleArg2 = " -seed.hex 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
-static const std::string exampleArg3 = " -s.hex 000102030405060708090a0b0c0d0e0f -chain \"m/0'/0\"";
+static const std::string exampleArg1 = " --seed \"correct horse battery staple\" --chain \"m/0'/0\"";
+static const std::string exampleArg2 = " --seed.hex 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
+static const std::string exampleArg3 = " -s.hex 000102030405060708090a0b0c0d0e0f --chain \"m/0'/0\"";
 static const std::string exampleArg4 = " -s.h 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
 static const std::string exampleArg5 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -c \"m/0'/0\"";
-static const std::string exampleArg6 = " -extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/0\"";
+static const std::string exampleArg6 = " --extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/0\"";
 
-static const std::string exampleArg7 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
+static const std::string exampleArg7 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 static const std::string exampleArg8 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
-static const std::string exampleArg9 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
-static const std::string exampleArg10 = " -extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -chain \"m/0'/(5-8)'\"";
+static const std::string exampleArg9 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
+static const std::string exampleArg10 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" --chain \"m/0'/(5-8)'\"";
 
-static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" -chain \"m/0/(3-4)/(1-2)\" -traverse levelorder";
-static const std::string exampleArg12 = " -seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\" -trav postorder";
+static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/(3-4)/(1-2)\" --traverse levelorder";
+static const std::string exampleArg12 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\" -trav postorder";
 
-static const std::string exampleArg13 = " -verbose -s.h \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-4)'/6'\"";
+static const std::string exampleArg13 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
 static const std::string exampleArg14 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 
 namespace TreeTraversal {
