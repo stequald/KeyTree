@@ -47,7 +47,7 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" --chain "m/0'/(5-8)'"
 
 ###### It is also possible to output the nodes in a different order:
-    ./kt -ek "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw" —chain "m/0/(3-4)/(1-2)" --traverse levelorder
+    ./kt --seed "correct horse battery staple" --chain "m/0/(3-4)/(1-2)" --traverse levelorder
     ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'" -trav postorder
 
 ###### For more info on nodes use the verbose option:
