@@ -24,7 +24,6 @@
 
 #include <iostream>
 #include <algorithm>
-#include <map>
 #include <stdexcept>
 #include <sstream>
 #include <deque>
@@ -46,6 +45,7 @@ static const std::string TREE_TRAVERSAL_OPTION = "-traverse";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "-preorder";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "-postorder";
 static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "-levelorder";
+static const std::string LEAF_OPTION = "-leaf";
 static const std::string VERBOSE_OPTION = "-verbose";
 
 static const std::string SEED_SHORT = "s";
@@ -59,6 +59,7 @@ static const std::string TREE_TRAVERSAL_OPTION_SHORT = "trav";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER_SHORT = "pre";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER_SHORT = "post";
 static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER_SHORT = "lev";
+static const std::string LEAF_OPTION_SHORT = "l";
 static const std::string VERBOSE_OPTION_SHORT = "v";
 
 static const std::string cmdName = "./kt";
@@ -78,23 +79,35 @@ static const std::string exampleArg10 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4M
 static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/(3-4)/(1-2)\" --traverse levelorder";
 static const std::string exampleArg12 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\" -trav postorder";
 
-static const std::string exampleArg13 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
-static const std::string exampleArg14 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
+static const std::string exampleArg13 = " --leaf -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/6'\"";
+static const std::string exampleArg14 = " -l -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/(6-8)'\"";
+
+static const std::string exampleArg15 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
+static const std::string exampleArg16 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 
 static const TreeTraversal::Type defaultTreeTraversalType = TreeTraversal::preorder;
 
 
-void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr, StringUtils::StringFormat seedStringFormat, TreeTraversal::Type traversalType = defaultTreeTraversalType, const bool isVerbose = false);
-void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr, TreeTraversal::Type traversalType = defaultTreeTraversalType, const bool isVerbose = false);
-void outputKeyAddressofExtKey(const std::string& extKey, const bool isVerbose = false);
+void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
+                           StringUtils::StringFormat seedStringFormat,
+                           const OptionsDict& optionsDict = OptionsDict(),
+                           TreeTraversal::Type traversalType = defaultTreeTraversalType);
+void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr,
+                             const OptionsDict& optionsDict = OptionsDict(),
+                             TreeTraversal::Type traversalType = defaultTreeTraversalType);
+void outputKeyAddressofExtKey(const std::string& extKey,
+                              const OptionsDict& optionsDict = OptionsDict());
 void outputString(const std::string& str);
-void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName, const bool isVerbose = false);
-void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName, const bool isVerbose = false);
+void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName,
+                      const OptionsDict& optionsDict = OptionsDict());
+void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName,
+                       const OptionsDict& optionsDict = OptionsDict());
 void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, const std::string& chainName,
                         uint64_t level, std::deque<KeyNode>& keyNodeDeq,
                         std::deque<std::pair<uint64_t,std::string>>& levelNChainDeq,
-                        bool isVerbose = false);
-void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVerbose = false);
+                        const OptionsDict& optionsDict = OptionsDict());
+void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLeafNode,
+           const OptionsDict& optionsDict = OptionsDict());
 void outputExtraKeyNodeData(const KeyNode& keyNode);
 
 
@@ -138,6 +151,8 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         } else if(arg == TREE_TRAVERSAL_OPTION || arg == TREE_TRAVERSAL_OPTION_SHORT) {
             ++it;
             argsDict[TREE_TRAVERSAL_OPTION] = *it;
+        } else if(arg == LEAF_OPTION || arg == LEAF_OPTION_SHORT) {
+            argsDict[LEAF_OPTION] = "Y";
         } else if(arg == VERBOSE_OPTION || arg == VERBOSE_OPTION_SHORT) {
             argsDict[VERBOSE_OPTION] = "Y";
         } else {
@@ -180,9 +195,14 @@ void outputExamples() {
     outputString(cmdName+exampleArg12);
     outputString("");
 
-    outputString("For more info on nodes use the verbose option:");
+    outputString("To output only information at the end of the chain, ie the leaf nodes, use the leaf option:");
     outputString(cmdName+exampleArg13);
     outputString(cmdName+exampleArg14);
+    outputString("");
+
+    outputString("For more info on nodes use the verbose option:");
+    outputString(cmdName+exampleArg15);
+    outputString(cmdName+exampleArg16);
 }
 
 TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption) {
@@ -199,8 +219,8 @@ TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption) {
         return defaultTreeTraversalType;
 }
 
-bool getIsVerbose(std::string verboseOption) {
-    if (verboseOption == "Y") return true;
+bool getOptionValue(std::string option) {
+    if (option == "Y") return true;
     else return false;
 }
 
@@ -223,20 +243,26 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         else
         seed_format = StringUtils::ascii;
         
-        bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
+        OptionsDict optionsDict;
+        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromSeed(seed, chain, seed_format, traverseType, isVerbose);
+        outputExtKeysFromSeed(seed, chain, seed_format, optionsDict, traverseType);
     } else if (argsDict[EXTENDEDKEY] != "" && argsDict[CHAIN] != "") {
         std::string extkey = argsDict[EXTENDEDKEY];
         std::string chain = argsDict[CHAIN];
         
-        bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
+        OptionsDict optionsDict;
+        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromExtKey(extkey, chain, traverseType, isVerbose);
+        outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
     } else if (argsDict[EXTENDEDKEY] != "") {
         std::string extkey = argsDict[EXTENDEDKEY];
-        bool isVerbose = getIsVerbose(argsDict[VERBOSE_OPTION]);
-        outputKeyAddressofExtKey(extkey, isVerbose);
+        OptionsDict optionsDict;
+        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
+        outputKeyAddressofExtKey(extkey, optionsDict);
     } else {
         throw std::invalid_argument("Invalid arguments.");
     }
@@ -270,7 +296,12 @@ int main(int argc, const char * argv[]) {
     }
 }
 
-void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVerbose) {
+void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLeafNode,
+           const OptionsDict& optionsDict) {
+    
+    if (! isLeafNode && optionsDict.at(LEAF_OPTION))
+        return;
+    
     outputString("* [Chain " + chainName + "]");
     if (keyNode.isPrivate()) {
         KeyNode keyNodePub= keyNode.getPublic();
@@ -278,13 +309,13 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVe
         outputString("  * ext prv:  " + toBase58Check(keyNode.extkey()));
         outputString("  * priv key: " + keyNode.privkey());
         outputString("  * address:  " + keyNode.address());
-        if (isVerbose) {
+        if (optionsDict.at(VERBOSE_OPTION)) {
             outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
         }
     } else {
         outputString("  * ext pub:  " + toBase58Check(keyNode.extkey()));
         outputString("  * address:  " + keyNode.address());
-        if (isVerbose) {
+        if (optionsDict.at(VERBOSE_OPTION)) {
             outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
         }
     }
@@ -293,7 +324,9 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isVe
 void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, const std::string& chainName,
                         uint64_t level, std::deque<KeyNode>& keyNodeDeq,
                         std::deque<std::pair<uint64_t,std::string>>& levelNChainDeq,
-                        bool isVerbose) {
+                        const OptionsDict& optionsDict) {
+
+    bool isLeafNode = false;
     if (level < treeChains.size()) {
         IsPrivateNPathRange isPrivateNPathRange = treeChains.at(level);
         bool isPrivate = isPrivateNPathRange.first;
@@ -311,9 +344,11 @@ void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, co
             keyNodeDeq.push_back(childNode);
             levelNChainDeq.push_back(std::pair<uint64_t,std::string>(level,childChainName));
         }
+    } else {
+        isLeafNode = true;
     }
 
-    visit(keyNode, chainName, isVerbose);
+    visit(keyNode, chainName, isLeafNode, optionsDict);
     
     if (! keyNodeDeq.empty()) {
         std::pair<uint64_t,std::string> pair = levelNChainDeq.front();
@@ -322,11 +357,12 @@ void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, co
         KeyNode node = keyNodeDeq.front();
         keyNodeDeq.pop_front();
         levelNChainDeq.pop_front();
-        traverseLevelorder(node, treeChains, cc, lev, keyNodeDeq, levelNChainDeq, isVerbose);
+        traverseLevelorder(node, treeChains, cc, lev, keyNodeDeq, levelNChainDeq, optionsDict);
     }
 }
 
-void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName, const bool isVerbose) {
+void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName,
+                      const OptionsDict& optionsDict) {
     if (! treeChains.empty()) {
         IsPrivateNPathRange isPrivateNPathRange = treeChains.front();
         treeChains.pop_front();
@@ -334,24 +370,28 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
         Range range = isPrivateNPathRange.second;
         uint32_t min = range.first;
         uint32_t max = range.second;
-        
+        bool isLeafNode = false;
+        if (treeChains.empty()) isLeafNode = true;
+
         if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
-            visit(keyNode, "m", isVerbose);
-            traversePreorder(keyNode, treeChains, chainName, isVerbose);
+            visit(keyNode, "m", isLeafNode, optionsDict);
+            traversePreorder(keyNode, treeChains, chainName, optionsDict);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
                 uint32_t k = i;
                 if (isPrivate) k = KeyTreeUtil::toPrime(k);
                 std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);
-                visit(childNode, childChainName, isVerbose);
-                traversePreorder(childNode, treeChains, childChainName, isVerbose);
+                
+                visit(childNode, childChainName, isLeafNode, optionsDict);
+                traversePreorder(childNode, treeChains, childChainName, optionsDict);
             }
         }
     }
 }
 
-void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName, const bool isVerbose) {
+void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std::string& chainName,
+                       const OptionsDict& optionsDict) {
     if (! treeChains.empty()) {
         IsPrivateNPathRange isPrivateNPathRange = treeChains.front();
         treeChains.pop_front();
@@ -359,26 +399,28 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
         Range range = isPrivateNPathRange.second;
         uint32_t min = range.first;
         uint32_t max = range.second;
-        
+        bool isLeafNode = false;
+        if (treeChains.empty()) isLeafNode = true;
+
         if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
-            traversePostorder(keyNode, treeChains, chainName, isVerbose);
-            visit(keyNode, "m", isVerbose);
+            traversePostorder(keyNode, treeChains, chainName, optionsDict);
+            visit(keyNode, "m", isLeafNode, optionsDict);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
                 uint32_t k = i;
                 if (isPrivate) k = KeyTreeUtil::toPrime(k);
                 std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);
-                traversePostorder(childNode, treeChains, childChainName, isVerbose);
-                visit(childNode, childChainName, isVerbose);
+                traversePostorder(childNode, treeChains, childChainName, optionsDict);
+                visit(childNode, childChainName, isLeafNode, optionsDict);
             }
         }
     }
 }
 
 void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
-                           StringUtils::StringFormat seedStringFormat, TreeTraversal::Type traversalType,
-                           bool isVerbose) {
+                           StringUtils::StringFormat seedStringFormat, const OptionsDict& optionsDict,
+                           TreeTraversal::Type traversalType) {
     std::string seedHex;
     if (seedStringFormat == StringUtils::ascii) {
         seedHex = StringUtils::string_to_hex(seed);
@@ -399,15 +441,15 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
     outputString("Master (hex): " + seedHex);
     
     if (traversalType == TreeTraversal::postorder)
-        traversePostorder(prv, treeChains, "m", isVerbose);
+        traversePostorder(prv, treeChains, "m", optionsDict);
     else if (traversalType == TreeTraversal::levelorder) {
         treeChains.pop_front();
         std::deque<KeyNode> KeyNodeDeq;
         std::deque<std::pair<uint64_t,std::string>> levelNChainDeq;
-        traverseLevelorder(prv, treeChains, "m", 0, KeyNodeDeq, levelNChainDeq, isVerbose);
+        traverseLevelorder(prv, treeChains, "m", 0, KeyNodeDeq, levelNChainDeq, optionsDict);
     }
     else
-        traversePreorder(prv, treeChains, "m", isVerbose);
+        traversePreorder(prv, treeChains, "m", optionsDict);
 }
 
 void outputExtraKeyNodeData(const KeyNode& keyNode) {
@@ -428,29 +470,29 @@ void outputExtraKeyNodeData(const KeyNode& keyNode) {
 }
 
 void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr,
-                             TreeTraversal::Type traversalType, const bool isVerbose) {
+                             const OptionsDict& optionsDict, TreeTraversal::Type traversalType) {
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
     TreeChains treeChains = KeyTreeUtil::parseChainString(chainStr, keyNode.isPrivate());
     
-    if (isVerbose) outputExtraKeyNodeData(keyNode);
+    if (optionsDict.at(VERBOSE_OPTION)) outputExtraKeyNodeData(keyNode);
 
     if (traversalType == TreeTraversal::postorder)
-        traversePostorder(keyNode, treeChains, "___", isVerbose);
+        traversePostorder(keyNode, treeChains, "___", optionsDict);
     else if (traversalType == TreeTraversal::levelorder) {
         treeChains.pop_front();
         std::deque<KeyNode> KeyNodeDeq;
         std::deque<std::pair<uint64_t,std::string>> levelNChainDeq;
-        traverseLevelorder(keyNode, treeChains, "___", 0, KeyNodeDeq, levelNChainDeq, isVerbose);
+        traverseLevelorder(keyNode, treeChains, "___", 0, KeyNodeDeq, levelNChainDeq, optionsDict);
     } else
-        traversePreorder(keyNode, treeChains, "___", isVerbose);
+        traversePreorder(keyNode, treeChains, "___", optionsDict);
 }
 
-void outputKeyAddressofExtKey(const std::string& extKey, const bool isVerbose) {
+void outputKeyAddressofExtKey(const std::string& extKey, const OptionsDict& optionsDict) {
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    visit(keyNode, "___", isVerbose);
-    if (isVerbose) outputExtraKeyNodeData(keyNode);
+    visit(keyNode, "___", true, optionsDict);
+    if (optionsDict.at(VERBOSE_OPTION)) outputExtraKeyNodeData(keyNode);
     outputString("");
 }
 

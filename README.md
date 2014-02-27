@@ -50,6 +50,10 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt --seed "correct horse battery staple" --chain "m/0/(3-4)/(1-2)" --traverse levelorder
     ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'" -trav postorder
 
+###### To output only information at the end of the chain, ie the leaf nodes, use the leaf option:
+    ./kt --leaf -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/6'"
+    ./kt -l -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/(6-8)'"
+
 ###### For more info on nodes use the verbose option:
     ./kt --verbose -s.h "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'"
     ./kt -v -ek "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
