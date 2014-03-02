@@ -374,7 +374,7 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
         if (treeChains.empty()) isLeafNode = true;
 
         if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
-            visit(keyNode, "m", isLeafNode, optionsDict);
+            visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
             traversePreorder(keyNode, treeChains, chainName, optionsDict);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
@@ -404,7 +404,7 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
 
         if (min == KeyTreeUtil::NODE_IDX_M && max == KeyTreeUtil::NODE_IDX_M) {
             traversePostorder(keyNode, treeChains, chainName, optionsDict);
-            visit(keyNode, "m", isLeafNode, optionsDict);
+            visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
         } else {
             for (uint32_t i = min; i <= max; ++i) {
                 uint32_t k = i;
@@ -441,15 +441,15 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
     outputString("Master (hex): " + seedHex);
     
     if (traversalType == TreeTraversal::postorder)
-        traversePostorder(prv, treeChains, "m", optionsDict);
+        traversePostorder(prv, treeChains, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, optionsDict);
     else if (traversalType == TreeTraversal::levelorder) {
         treeChains.pop_front();
         std::deque<KeyNode> KeyNodeDeq;
         std::deque<std::pair<uint64_t,std::string>> levelNChainDeq;
-        traverseLevelorder(prv, treeChains, "m", 0, KeyNodeDeq, levelNChainDeq, optionsDict);
+        traverseLevelorder(prv, treeChains, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, 0, KeyNodeDeq, levelNChainDeq, optionsDict);
     }
     else
-        traversePreorder(prv, treeChains, "m", optionsDict);
+        traversePreorder(prv, treeChains, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, optionsDict);
 }
 
 void outputExtraKeyNodeData(const KeyNode& keyNode) {
@@ -478,20 +478,20 @@ void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chain
     if (optionsDict.at(VERBOSE_OPTION)) outputExtraKeyNodeData(keyNode);
 
     if (traversalType == TreeTraversal::postorder)
-        traversePostorder(keyNode, treeChains, "___", optionsDict);
+        traversePostorder(keyNode, treeChains, KeyTreeUtil::LEAD_CHAIN_PATH, optionsDict);
     else if (traversalType == TreeTraversal::levelorder) {
         treeChains.pop_front();
         std::deque<KeyNode> KeyNodeDeq;
         std::deque<std::pair<uint64_t,std::string>> levelNChainDeq;
-        traverseLevelorder(keyNode, treeChains, "___", 0, KeyNodeDeq, levelNChainDeq, optionsDict);
+        traverseLevelorder(keyNode, treeChains, KeyTreeUtil::LEAD_CHAIN_PATH, 0, KeyNodeDeq, levelNChainDeq, optionsDict);
     } else
-        traversePreorder(keyNode, treeChains, "___", optionsDict);
+        traversePreorder(keyNode, treeChains, KeyTreeUtil::LEAD_CHAIN_PATH, optionsDict);
 }
 
 void outputKeyAddressofExtKey(const std::string& extKey, const OptionsDict& optionsDict) {
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    visit(keyNode, "___", true, optionsDict);
+    visit(keyNode, KeyTreeUtil::LEAD_CHAIN_PATH, true, optionsDict);
     if (optionsDict.at(VERBOSE_OPTION)) outputExtraKeyNodeData(keyNode);
     outputString("");
 }
