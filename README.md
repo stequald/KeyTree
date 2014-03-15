@@ -58,5 +58,9 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt --verbose -s.h "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'"
     ./kt -v -ek "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
 
+###### By specifying the seed or extended key argument at the end, you will enter the prompt mode:
+    ./kt --verbose -l --seed
+    ./kt -trav lev -ek
+
 ##### For more on how to use KeyTree do:
     $./kt --help
