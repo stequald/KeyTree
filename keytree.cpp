@@ -43,9 +43,9 @@ static const std::string SEED_HEX = "-seed.hex";
 static const std::string EXTENDEDKEY = "-extkey";
 static const std::string CHAIN = "-chain";
 static const std::string TREE_TRAVERSAL_OPTION = "-traverse";
-static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "-preorder";
-static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "-postorder";
-static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "-levelorder";
+static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "preorder";
+static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "postorder";
+static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "levelorder";
 static const std::string LEAF_OPTION = "-leaf";
 static const std::string VERBOSE_OPTION = "-verbose";
 
