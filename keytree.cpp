@@ -146,31 +146,13 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
             break;
         } else if (arg == SEED || arg == SEED_SHORT) {
             argsDict[SEED_FORMAT] = ""; //assumes ascii
-            if (it != end-1) {
-                ++it;
-                argsDict[SEED] = *it;
-            } else {
-                argsDict[ENTER_PROMPT] = "Y";
-                argsDict[SEED] = "Y";
-            }
+            argsDict[SEED] = "Y";
         } else if (arg == SEED_HEX || arg == SEED_HEX_SHORT
                    || arg == SEED_SHORT_HEX || arg == SEED_SHORT_HEX_SHORT) {
             argsDict[SEED_FORMAT] = "hex";
-            if (it != end-1) {
-                ++it;
-                argsDict[SEED] = *it;
-            } else {
-                argsDict[ENTER_PROMPT] = "Y";
-                argsDict[SEED] = "Y";
-            }
+            argsDict[SEED] = "Y";
         } else if(arg == EXTENDEDKEY || arg == EXTENDEDKEY_SHORT) {
-            if (it != end-1) {
-                ++it;
-                argsDict[EXTENDEDKEY] = *it;
-            } else {
-                argsDict[ENTER_PROMPT] = "Y";
-                argsDict[EXTENDEDKEY] = "Y";
-            }
+            argsDict[EXTENDEDKEY] = "Y";
         } else if(arg == CHAIN || arg == CHAIN_SHORT) {
             ++it;
             argsDict[CHAIN] = *it;
@@ -185,6 +167,11 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         } else {
             throw std::invalid_argument("Invalid arguments.");
         }
+    }
+    
+    //default to seed if no option provided
+    if (argsDict.find(EXTENDEDKEY) == argsDict.end() && argsDict.find(SEED) == argsDict.end()) {
+        argsDict[SEED] = "Y";
     }
     
     return argsDict;
@@ -257,7 +244,9 @@ bool getOptionValue(std::string option) {
 }
 
 int enter_prompt(std::map<std::string, std::string> argsDict) {
-    if (getOptionValue(argsDict[SEED])) {
+    if (argsDict[HELP] == HELP) {
+        outputExamples();
+    } else if (getOptionValue(argsDict[SEED])) {
         std::string seed;
         std::string chain;
         
@@ -266,6 +255,8 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
             seed_format = StringUtils::hex;
             outputString("Enter Seed in Hex:");
             std::getline( std::cin, seed );
+            if (! StringUtils::isHex(seed))
+                throw std::runtime_error("Invalid hex string \"" + seed + "\"");
         } else {
             seed_format = StringUtils::ascii;
             outputString("Enter Seed:");
@@ -303,52 +294,6 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
     return 0;
 }
 
-int handle_arguments(std::map<std::string, std::string> argsDict) {
-    Logger::debug("Arguments:");
-    for (auto arg : argsDict) {
-        Logger::debug("\tkey: " + arg.first + " value: " + arg.second);
-    }
-    Logger::debug("");
-    if (argsDict[HELP] == HELP) {
-        outputExamples();
-        return 0;
-    } else if (argsDict[SEED] != "" && argsDict[CHAIN] != "") {
-        std::string seed = argsDict[SEED];
-        std::string chain = argsDict[CHAIN];
-        
-        StringUtils::StringFormat seed_format;
-        if (argsDict[SEED_FORMAT] == "hex")
-            seed_format = StringUtils::hex;
-        else
-            seed_format = StringUtils::ascii;
-        
-        OptionsDict optionsDict;
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromSeed(seed, chain, seed_format, optionsDict, traverseType);
-    } else if (argsDict[EXTENDEDKEY] != "" && argsDict[CHAIN] != "") {
-        std::string extkey = argsDict[EXTENDEDKEY];
-        std::string chain = argsDict[CHAIN];
-        
-        OptionsDict optionsDict;
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
-    } else if (argsDict[EXTENDEDKEY] != "") {
-        std::string extkey = argsDict[EXTENDEDKEY];
-        OptionsDict optionsDict;
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        outputKeyAddressofExtKey(extkey, optionsDict);
-    } else {
-        throw std::invalid_argument("Invalid arguments.");
-    }
-    
-    return 0;
-}
-
 void outputString(const std::string& str) {
     Logger::log(str);
 }
@@ -363,11 +308,7 @@ int main(int argc, const char * argv[]) {
     
     try {
         std::map<std::string, std::string> argsDict = parse_arguments(argv+1, argv+argc);
-        if (getOptionValue(argsDict[ENTER_PROMPT])) {
-            return enter_prompt(argsDict);
-        } else {
-            return handle_arguments(argsDict);
-        }
+        return enter_prompt(argsDict);
     }
     catch (const std::invalid_argument& err) {
         outputString("Error: " + std::string(err.what()));

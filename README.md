@@ -30,37 +30,43 @@ There are other tools that have HDWallet implementations, but their purposes are
 
 Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples below.
 
-###### Given seed and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:
-    ./kt --seed "correct horse battery staple" --chain "m/0'/0"
-    ./kt --seed.hex 000102030405060708090a0b0c0d0e0f --chain "m/0'/0"
+###### To use KeyTree simply do the following:
+    ./kt
+    Enter Seed:
+    correct horse battery staple
+    Enter Chain:
+    m/0'/0
 
-###### Given extended key and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:
-    ./kt --extkey xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7 --chain "m/0'/0"
-    ./kt --extkey xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw --chain "m/0/0"
-
-###### Given extended key KeyTree will print extended keys, private key and address of extended key:
-    ./kt --extkey xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7
-    ./kt --extkey xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw
+###### use the hex option to enter the seed in hex:
+    ./kt --seed.hex 
+    Enter Seed in Hex:
+    000102030405060708090a0b0c0d0e0f
+    Enter Chain:
+    m/0'/0
+  
+###### use the extended key option to enter the extended key in lieu of the seed:
+    ./kt --extkey 
+    ./kt -ek 
 
 ###### It is also possible to print multiple chain paths together:
-    ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-6)'/(1-2)/8"
-    ./kt --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" --chain "m/0'/(5-8)'"
+    ./kt -ek
+    Enter Extended Key:
+    xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7
+    Enter Chain:
+    m/0'/(3-6)'/(1-2)/8
 
 ###### To output all the node data on the chain, use the all option:
-    ./kt --all -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/6'"
-    ./kt -a -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/(6-8)'"
+    ./kt --all
+    ./kt -a
 
 ###### It is also possible to output the nodes in a different order:
-    ./kt --seed "correct horse battery staple" --chain "m/0/(3-4)/(1-2)" --traverse levelorder
-    ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'" -trav postorder
+    ./kt --traverse levelorder
+    ./kt -s.h -trav postorder
+    ./kt -ek -trav preorder
 
 ###### For more info on nodes use the verbose option:
-    ./kt --verbose -s.h "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'"
-    ./kt -v -ek "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
+    ./kt --verbose
+    ./kt -v
 
-###### By specifying the seed or extended key argument at the end, you will enter the prompt mode:
-    ./kt --verbose -a --seed
-    ./kt -trav lev -ek
-
-##### For more on how to use KeyTree do:
+##### For more info on how to use KeyTree do:
     $./kt --help
