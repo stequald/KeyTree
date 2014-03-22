@@ -46,7 +46,7 @@ static const std::string TREE_TRAVERSAL_OPTION = "-traverse";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER = "preorder";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER = "postorder";
 static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "levelorder";
-static const std::string LEAF_OPTION = "-leaf";
+static const std::string OUTPUT_ENTIRE_CHAIN_OPTION = "-all";
 static const std::string VERBOSE_OPTION = "-verbose";
 
 static const std::string SEED_SHORT = "s";
@@ -60,7 +60,7 @@ static const std::string TREE_TRAVERSAL_OPTION_SHORT = "trav";
 static const std::string TREE_TRAVERSAL_TYPE_PREORDER_SHORT = "pre";
 static const std::string TREE_TRAVERSAL_TYPE_POSTORDER_SHORT = "post";
 static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER_SHORT = "lev";
-static const std::string LEAF_OPTION_SHORT = "l";
+static const std::string OUTPUT_ENTIRE_CHAIN_OPTION_SHORT = "a";
 static const std::string VERBOSE_OPTION_SHORT = "v";
 
 static const std::string cmdName = "./kt";
@@ -74,19 +74,19 @@ static const std::string exampleArg6 = " --extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHx
 static const std::string exampleArg7 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 static const std::string exampleArg8 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
 
-static const std::string exampleArg9 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" -chain \"m/0'/(3-6)'/(1-2)/8\"";
+static const std::string exampleArg9 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-6)'/(1-2)/8\"";
 static const std::string exampleArg10 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" --chain \"m/0'/(5-8)'\"";
 
 static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/(3-4)/(1-2)\" --traverse levelorder";
 static const std::string exampleArg12 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\" -trav postorder";
 
-static const std::string exampleArg13 = " --leaf -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/6'\"";
-static const std::string exampleArg14 = " -l -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/(6-8)'\"";
+static const std::string exampleArg13 = " --all -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/6'\"";
+static const std::string exampleArg14 = " -a -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/(6-8)'\"";
 
 static const std::string exampleArg15 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
 static const std::string exampleArg16 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
 
-static const std::string exampleArg17 = " --verbose -l --seed";
+static const std::string exampleArg17 = " --verbose -a --seed";
 static const std::string exampleArg18 = " -trav lev -ek";
 
 
@@ -117,12 +117,18 @@ void outputExtraKeyNodeData(const KeyNode& keyNode);
 
 
 void testVector1() {
-    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex);
+    OptionsDict optionsDict;
+    optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
+    optionsDict[VERBOSE_OPTION] = false;
+    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex, optionsDict);
 }
 
 void testVector2() {
+    OptionsDict optionsDict;
+    optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
+    optionsDict[VERBOSE_OPTION] = false;
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
-    outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::hex);
+    outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::hex, optionsDict);
 }
 
 template<typename It>
@@ -171,8 +177,9 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
         } else if(arg == TREE_TRAVERSAL_OPTION || arg == TREE_TRAVERSAL_OPTION_SHORT) {
             ++it;
             argsDict[TREE_TRAVERSAL_OPTION] = *it;
-        } else if(arg == LEAF_OPTION || arg == LEAF_OPTION_SHORT) {
-            argsDict[LEAF_OPTION] = "Y";
+            argsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = "Y";
+        } else if(arg == OUTPUT_ENTIRE_CHAIN_OPTION || arg == OUTPUT_ENTIRE_CHAIN_OPTION_SHORT) {
+            argsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = "Y";
         } else if(arg == VERBOSE_OPTION || arg == VERBOSE_OPTION_SHORT) {
             argsDict[VERBOSE_OPTION] = "Y";
         } else {
@@ -188,36 +195,36 @@ void outputExamples() {
     outputString("Here are some examples:");
     outputString("");
     
-    outputString("Given Seed and Chain will output Child Extended Keys:");
+    outputString("Given seed and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:");
     outputString(cmdName+exampleArg1);
     outputString(cmdName+exampleArg2);
     outputString(cmdName+exampleArg3);
     outputString(cmdName+exampleArg4);
     outputString("");
     
-    outputString("Given Extended Key and Chain will output Child Extended Keys:");
+    outputString("Given extended key and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:");
     outputString(cmdName+exampleArg5);
     outputString(cmdName+exampleArg6);
     outputString("");
     
-    outputString("Given Extended Key will output Private Key and Address of Extended Key:");
+    outputString("Given extended key KeyTree will print extended keys, private key and address of extended key:");
     outputString(cmdName+exampleArg7);
     outputString(cmdName+exampleArg8);
     outputString("");
 
-    outputString("It is also possible to have multiple chain paths:");
+    outputString("It is also possible to print multiple chain paths together:");
     outputString(cmdName+exampleArg9);
     outputString(cmdName+exampleArg10);
     outputString("");
 
-    outputString("It is also possible to output the Extended Keys in a different order:");
-    outputString(cmdName+exampleArg11);
-    outputString(cmdName+exampleArg12);
-    outputString("");
-
-    outputString("To output only information at the end of the chain, ie the leaf nodes, use the leaf option:");
+    outputString("To output all the node data on the chain, use the all option:");
     outputString(cmdName+exampleArg13);
     outputString(cmdName+exampleArg14);
+    outputString("");
+
+    outputString("It is also possible to output the nodes in a different order:");
+    outputString(cmdName+exampleArg11);
+    outputString(cmdName+exampleArg12);
     outputString("");
 
     outputString("For more info on nodes use the verbose option:");
@@ -269,7 +276,7 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         std::getline( std::cin, chain );
         
         OptionsDict optionsDict;
-        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         outputExtKeysFromSeed(seed, chain, seed_format, optionsDict, traverseType);
@@ -285,7 +292,7 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         std::getline( std::cin, chain );
         
         OptionsDict optionsDict;
-        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         if(! chain.empty())
@@ -316,7 +323,7 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
             seed_format = StringUtils::ascii;
         
         OptionsDict optionsDict;
-        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         outputExtKeysFromSeed(seed, chain, seed_format, optionsDict, traverseType);
@@ -325,14 +332,14 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         std::string chain = argsDict[CHAIN];
         
         OptionsDict optionsDict;
-        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
     } else if (argsDict[EXTENDEDKEY] != "") {
         std::string extkey = argsDict[EXTENDEDKEY];
         OptionsDict optionsDict;
-        optionsDict[LEAF_OPTION] = getOptionValue(argsDict[LEAF_OPTION]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         outputKeyAddressofExtKey(extkey, optionsDict);
     } else {
@@ -375,7 +382,7 @@ int main(int argc, const char * argv[]) {
 void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLeafNode,
            const OptionsDict& optionsDict) {
     
-    if (! isLeafNode && optionsDict.at(LEAF_OPTION))
+    if (! isLeafNode && ! optionsDict.at(OUTPUT_ENTIRE_CHAIN_OPTION))
         return;
     
     outputString("* [Chain " + chainName + "]");

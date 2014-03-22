@@ -30,11 +30,11 @@ There are other tools that have HDWallet implementations, but their purposes are
 
 Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples below.
 
-###### Given seed and chain KeyTree will print child extended keys, bitcoin private keys and addresses:
+###### Given seed and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:
     ./kt --seed "correct horse battery staple" --chain "m/0'/0"
     ./kt --seed.hex 000102030405060708090a0b0c0d0e0f --chain "m/0'/0"
 
-###### Given extended key and chain KeyTree will print child extended keys, bitcoin private keys and addresses:
+###### Given extended key and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:
     ./kt --extkey xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7 --chain "m/0'/0"
     ./kt --extkey xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw --chain "m/0/0"
 
@@ -46,20 +46,20 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-6)'/(1-2)/8"
     ./kt --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" --chain "m/0'/(5-8)'"
 
+###### To output all the node data on the chain, use the all option:
+    ./kt --all -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/6'"
+    ./kt -a -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/(6-8)'"
+
 ###### It is also possible to output the nodes in a different order:
     ./kt --seed "correct horse battery staple" --chain "m/0/(3-4)/(1-2)" --traverse levelorder
     ./kt --seed.hex "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'" -trav postorder
-
-###### To output only information at the end of the chain, ie the leaf nodes, use the leaf option:
-    ./kt --leaf -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/6'"
-    ./kt -l -s.h "000102030405060708090a0b0c0d0e0f" -c "m/0'/(3-4)'/(6-8)'"
 
 ###### For more info on nodes use the verbose option:
     ./kt --verbose -s.h "000102030405060708090a0b0c0d0e0f" --chain "m/0'/(3-4)'/6'"
     ./kt -v -ek "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7"
 
 ###### By specifying the seed or extended key argument at the end, you will enter the prompt mode:
-    ./kt --verbose -l --seed
+    ./kt --verbose -a --seed
     ./kt -trav lev -ek
 
 ##### For more on how to use KeyTree do:
