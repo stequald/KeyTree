@@ -34,6 +34,7 @@
 
 using namespace std;
 
+static const std::string cmdName = "./kt";
 static const std::string HELP = "-help";
 static const std::string ENTER_PROMPT = "prompt";
 static const std::string SEED_FORMAT = "seed_format";
@@ -62,33 +63,6 @@ static const std::string TREE_TRAVERSAL_TYPE_POSTORDER_SHORT = "post";
 static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER_SHORT = "lev";
 static const std::string OUTPUT_ENTIRE_CHAIN_OPTION_SHORT = "a";
 static const std::string VERBOSE_OPTION_SHORT = "v";
-
-static const std::string cmdName = "./kt";
-static const std::string exampleArg1 = " --seed \"correct horse battery staple\" --chain \"m/0'/0\"";
-static const std::string exampleArg2 = " --seed.hex 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
-static const std::string exampleArg3 = " -s.hex 000102030405060708090a0b0c0d0e0f --chain \"m/0'/0\"";
-static const std::string exampleArg4 = " -s.h 000102030405060708090a0b0c0d0e0f -c \"m/0'/0\"";
-static const std::string exampleArg5 = " -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" -c \"m/0'/0\"";
-static const std::string exampleArg6 = " --extkey \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/0\"";
-
-static const std::string exampleArg7 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
-static const std::string exampleArg8 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\"";
-
-static const std::string exampleArg9 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-6)'/(1-2)/8\"";
-static const std::string exampleArg10 = " --extkey \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\" --chain \"m/0'/(5-8)'\"";
-
-static const std::string exampleArg11 = " -ek \"xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw\" --chain \"m/0/(3-4)/(1-2)\" --traverse levelorder";
-static const std::string exampleArg12 = " --seed.hex \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\" -trav postorder";
-
-static const std::string exampleArg13 = " --all -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/6'\"";
-static const std::string exampleArg14 = " -a -s.h \"000102030405060708090a0b0c0d0e0f\" -c \"m/0'/(3-4)'/(6-8)'\"";
-
-static const std::string exampleArg15 = " --verbose -s.h \"000102030405060708090a0b0c0d0e0f\" --chain \"m/0'/(3-4)'/6'\"";
-static const std::string exampleArg16 = " -v -ek \"xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7\"";
-
-static const std::string exampleArg17 = " --verbose -a --seed";
-static const std::string exampleArg18 = " -trav lev -ek";
-
 
 static const TreeTraversal::Type defaultTreeTraversalType = TreeTraversal::preorder;
 
@@ -178,50 +152,52 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
 }
 
 void outputExamples() {
-    outputString("Input parameters can be in hex or base58.");
-    outputString("Here are some examples:");
+    outputString("Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples below.");
     outputString("");
     
-    outputString("Given seed and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:");
-    outputString(cmdName+exampleArg1);
-    outputString(cmdName+exampleArg2);
-    outputString(cmdName+exampleArg3);
-    outputString(cmdName+exampleArg4);
+    outputString("To use KeyTree simply do the following:");
+    outputString(cmdName);
+    outputString("Enter Seed:");
+    outputString("correct horse battery staple");
+    outputString("Enter Chain:");
+    outputString("m/0'/0");
     outputString("");
     
-    outputString("Given extended key and chain KeyTree will print the last child extended keys, bitcoin private keys and addresses:");
-    outputString(cmdName+exampleArg5);
-    outputString(cmdName+exampleArg6);
+    outputString("Use the hex option to enter the seed in hex:");
+    outputString(cmdName+" --seed.hex");
+    outputString("Enter Seed in Hex:");
+    outputString("000102030405060708090a0b0c0d0e0f");
+    outputString("Enter Chain:");
+    outputString("m/0'/0");
     outputString("");
-    
-    outputString("Given extended key KeyTree will print extended keys, private key and address of extended key:");
-    outputString(cmdName+exampleArg7);
-    outputString(cmdName+exampleArg8);
+
+    outputString("Use the extended key option to enter the extended key in lieu of the seed:");
+    outputString(cmdName+" --extkey");
+    outputString(cmdName+" -ek");
     outputString("");
 
     outputString("It is also possible to print multiple chain paths together:");
-    outputString(cmdName+exampleArg9);
-    outputString(cmdName+exampleArg10);
+    outputString(cmdName);
+    outputString("Enter Extended Key:");
+    outputString("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
+    outputString("Enter Chain:");
+    outputString("m/0'/(3-6)'/(1-2)/8");
     outputString("");
 
     outputString("To output all the node data on the chain, use the all option:");
-    outputString(cmdName+exampleArg13);
-    outputString(cmdName+exampleArg14);
+    outputString(cmdName+" --all");
+    outputString(cmdName+" -a");
     outputString("");
 
     outputString("It is also possible to output the nodes in a different order:");
-    outputString(cmdName+exampleArg11);
-    outputString(cmdName+exampleArg12);
+    outputString(cmdName+" --traverse levelorder");
+    outputString(cmdName+" -trav postorder");
+    outputString(cmdName+" -trav preorder");
     outputString("");
-
-    outputString("For more info on nodes use the verbose option:");
-    outputString(cmdName+exampleArg15);
-    outputString(cmdName+exampleArg16);
-    outputString("");
-
-    outputString("By specifying the seed or extended key argument at the end, you will enter the prompt mode:");
-    outputString(cmdName+exampleArg17);
-    outputString(cmdName+exampleArg18);
+    
+    outputString("For more information on the node use the verbose option:");
+    outputString(cmdName+" --verbose");
+    outputString(cmdName+" -v");
 }
 
 TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption) {

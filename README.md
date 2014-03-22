@@ -37,14 +37,14 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     Enter Chain:
     m/0'/0
 
-###### use the hex option to enter the seed in hex:
+###### Use the hex option to enter the seed in hex:
     ./kt --seed.hex 
     Enter Seed in Hex:
     000102030405060708090a0b0c0d0e0f
     Enter Chain:
     m/0'/0
   
-###### use the extended key option to enter the extended key in lieu of the seed:
+###### Use the extended key option to enter the extended key in lieu of the seed:
     ./kt --extkey 
     ./kt -ek 
 
@@ -64,9 +64,9 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     ./kt -s.h -trav postorder
     ./kt -ek -trav preorder
 
-###### For more info on nodes use the verbose option:
+###### For more information on nodes use the verbose option:
     ./kt --verbose
     ./kt -v
 
-##### For more info on how to use KeyTree do:
+##### For more information on how to use KeyTree do:
     $./kt --help
