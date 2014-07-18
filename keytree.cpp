@@ -396,16 +396,29 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLe
         KeyNode keyNodePub= keyNode.getPublic();
         outputString("  * ext pub:  " + toBase58Check(keyNodePub.extkey()));
         outputString("  * ext prv:  " + toBase58Check(keyNode.extkey()));
-        outputString("  * priv key: " + keyNode.privkey());
-        outputString("  * address:  " + keyNode.address());
-        if (optionsDict.at(VERBOSE_OPTION)) {
-            outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
+        if (! optionsDict.at(VERBOSE_OPTION)) {
+            outputString("  * priv key: " + keyNode.privkey());
+            //outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
+            outputString("  * address:  " + keyNode.address());
+        } else {
+            outputString("  * uncompressed priv key: " + keyNode.privkey(false));
+            outputString("  * uncompressed pub key:  " + toBase58Check(keyNode.pubkeyUncompressed()));
+            outputString("  * uncompressed address:  " + keyNode.address(false));
+
+            outputString("  * compressed priv key: " + keyNode.privkey(true));
+            outputString("  * compressed pub key:  " + toBase58Check(keyNode.pubkey()));
+            outputString("  * compressed address:  " + keyNode.address(true));
         }
     } else {
         outputString("  * ext pub:  " + toBase58Check(keyNode.extkey()));
-        outputString("  * address:  " + keyNode.address());
-        if (optionsDict.at(VERBOSE_OPTION)) {
-            outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
+        if (! optionsDict.at(VERBOSE_OPTION)) {
+            outputString("  * address:  " + keyNode.address());
+        } else {
+            //outputString("  * uncompressed pub key:  " + toBase58Check(keyNode.pubkeyUncompressed()));
+            //outputString("  * uncompressed address:  " + keyNode.address(false));
+            
+            outputString("  * compressed pub key:  " + toBase58Check(keyNode.pubkey()));
+            outputString("  * compressed address:  " + keyNode.address(true));
         }
     }
 }

@@ -45,7 +45,9 @@ public:
     KeyNode getChild(uint32_t i) const;
     KeyNode getPublic() const;
     std::string address() const;
+    std::string address(bool compressed) const;
     std::string privkey() const;
+    std::string privkey(bool compressed) const;
     static void setTestNet(bool enabled);
 private:
     static std::string secretToASecret(const uchar_vector& secret, bool compressed = false);

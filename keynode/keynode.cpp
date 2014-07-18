@@ -63,9 +63,26 @@ std::string KeyNode::privkey() const {
     return "";
 }
 
+std::string KeyNode::privkey(bool compressed) const {
+    if(this->isPrivate()) {
+        uchar_vector k = this->key();
+        k = k.getHex().substr(2);
+        return KeyNode::secretToASecret(k, compressed);
+    }
+    return "";
+}
+
 std::string KeyNode::address() const {
     uchar_vector K = this->pubkey();
     return KeyNode::publicKeyToAddress(K);
+}
+
+std::string KeyNode::address(bool compressed) const {
+    if (compressed){
+        return KeyNode::publicKeyToAddress(this->pubkey());
+    } else {
+        return KeyNode::publicKeyToAddress(this->pubkeyUncompressed());
+    }
 }
 
 uchar_vector KeyNode::hash160(const uchar_vector& public_key) {
