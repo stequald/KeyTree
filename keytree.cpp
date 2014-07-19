@@ -402,11 +402,11 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLe
             outputString("  * address:  " + keyNode.address());
         } else {
             outputString("  * uncompressed priv key: " + keyNode.privkey(false));
-            outputString("  * uncompressed pub key:  " + toBase58Check(keyNode.pubkeyUncompressed()));
+            outputString("  * uncompressed pub key:  " + uchar_vector(keyNode.pubkeyUncompressed()).getHex());
             outputString("  * uncompressed address:  " + keyNode.address(false));
 
             outputString("  * compressed priv key: " + keyNode.privkey(true));
-            outputString("  * compressed pub key:  " + toBase58Check(keyNode.pubkey()));
+            outputString("  * compressed pub key:  " + uchar_vector(keyNode.pubkey()).getHex());
             outputString("  * compressed address:  " + keyNode.address(true));
         }
     } else {
@@ -414,10 +414,10 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLe
         if (! optionsDict.at(VERBOSE_OPTION)) {
             outputString("  * address:  " + keyNode.address());
         } else {
-            //outputString("  * uncompressed pub key:  " + toBase58Check(keyNode.pubkeyUncompressed()));
+            //outputString("  * uncompressed pub key:  " + uchar_vector(keyNode.pubkeyUncompressed()).getHex());
             //outputString("  * uncompressed address:  " + keyNode.address(false));
             
-            outputString("  * compressed pub key:  " + toBase58Check(keyNode.pubkey()));
+            outputString("  * compressed pub key:  " + uchar_vector(keyNode.pubkey()).getHex());
             outputString("  * compressed address:  " + keyNode.address(true));
         }
     }
