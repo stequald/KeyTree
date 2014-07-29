@@ -398,7 +398,6 @@ void visit(const KeyNode& keyNode, const std::string& chainName, const bool isLe
         outputString("  * ext prv:  " + toBase58Check(keyNode.extkey()));
         if (! optionsDict.at(VERBOSE_OPTION)) {
             outputString("  * priv key: " + keyNode.privkey());
-            //outputString("  * pub key:  " + toBase58Check(keyNode.pubkey()));
             outputString("  * address:  " + keyNode.address());
         } else {
             outputString("  * uncompressed priv key: " + keyNode.privkey(false));
