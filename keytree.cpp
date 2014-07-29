@@ -27,6 +27,8 @@
 #include <stdexcept>
 #include <sstream>
 #include <deque>
+#include <termios.h>
+#include <unistd.h>
 #include "keynode/keynode.h"
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
@@ -41,6 +43,11 @@ using namespace std;
  ./kt --noprompt -s "this is a password" --chain "m/(0-1)'/(6-8)'" -trav levelorder
  ./kt -np --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -c "m/(0-1)'/8"
 */
+
+static bool noInputEcho = false;
+static const std::string NO_INPUT_ECHO = "-noecho";
+static const std::string NO_INPUT_ECHO_SHORT = "ne";
+
 static const std::string NO_PROMPT = "-noprompt";
 static const std::string NO_PROMPT_SHORT = "np";
 
@@ -175,6 +182,8 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
             argsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = "Y";
         } else if(arg == VERBOSE_OPTION || arg == VERBOSE_OPTION_SHORT) {
             argsDict[VERBOSE_OPTION] = "Y";
+        } else if(arg == NO_INPUT_ECHO || arg == NO_INPUT_ECHO_SHORT) {
+            noInputEcho = true;
         } else if(arg == NO_PROMPT || arg == NO_PROMPT_SHORT) {
             argsDict[NO_PROMPT] = "Y";
         } else {
@@ -258,6 +267,15 @@ bool getOptionValue(std::string option) {
     else return false;
 }
 
+std::string get_input(std::string pretext) {
+    if (! pretext.empty())
+        outputString(pretext);
+
+    std::string buffer;
+    std::getline(std::cin, buffer);
+    return buffer;
+}
+
 int enter_prompt(std::map<std::string, std::string> argsDict) {
     if (argsDict[HELP] == HELP) {
         outputExamples();
@@ -268,18 +286,15 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         StringUtils::StringFormat seed_format;
         if (argsDict[SEED_FORMAT] == "hex") {
             seed_format = StringUtils::hex;
-            outputString("Enter Seed in Hex:");
-            std::getline( std::cin, seed );
+            seed = get_input("Enter Seed in Hex:");
             if (! StringUtils::isHex(seed))
                 throw std::runtime_error("Invalid hex string \"" + seed + "\"");
         } else {
             seed_format = StringUtils::ascii;
-            outputString("Enter Seed:");
-            std::getline( std::cin, seed );
+            seed = get_input("Enter Seed:");
         }
 
-        outputString("Enter Chain:");
-        std::getline( std::cin, chain );
+        chain = get_input("Enter Chain:");
         
         OptionsDict optionsDict;
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
@@ -291,12 +306,10 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         std::string extkey;
         std::string chain;
         
-        outputString("Enter Extended Key:");
-        std::getline( std::cin, extkey );
+        extkey = get_input("Enter Extended Key:");
         
-        outputString("Enter Chain:");
-        std::getline( std::cin, chain );
-        
+        chain = get_input("Enter Chain:");
+
         OptionsDict optionsDict;
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
@@ -372,6 +385,13 @@ int main(int argc, const char * argv[]) {
         if (getOptionValue(argsDict[NO_PROMPT])) {
             return handle_arguments(argsDict);
         } else {
+            if (noInputEcho) {
+                termios oldt;
+                tcgetattr(STDIN_FILENO, &oldt);
+                termios newt = oldt;
+                newt.c_lflag &= ~ECHO;
+                tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+            }
             return enter_prompt(argsDict);
         }
     }
