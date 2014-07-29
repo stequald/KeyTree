@@ -92,6 +92,7 @@ std::map<std::string, std::string> parse_arguments(It begin, It end);
 void outputExamples();
 TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption);
 bool getOptionValue(std::string option);
+std::string get_input(std::string pretext);
 int enter_prompt(std::map<std::string, std::string> argsDict);
 int handle_arguments(std::map<std::string, std::string> argsDict);
 void outputString(const std::string& str);
