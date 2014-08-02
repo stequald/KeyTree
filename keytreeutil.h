@@ -31,7 +31,7 @@
 #include "keynode/logger.h"
 #include "keynode/CoinClasses/Base58Check.h"
 
-typedef std::pair<uint32_t,uint32_t> Range;
+typedef std::pair<uint64_t,uint64_t> Range;
 typedef std::pair<bool,Range> IsPrivateNPathRange; // < isPrivate, <min,max> >
 typedef std::deque<IsPrivateNPathRange> TreeChains;
 typedef std::map<std::string,bool> OptionsDict;
@@ -46,7 +46,7 @@ namespace TreeTraversal {
 
 namespace KeyTreeUtil
 {
-    const uint32_t NODE_IDX_M = -1;
+    const uint64_t NODE_IDX_M = uint64_t(std::numeric_limits<int>::max())+1;
     const std::string MASTER_NODE_LOWERCASE_M = "m";
     const std::string LEAD_CHAIN_PATH = "___";
     

@@ -475,12 +475,12 @@ void traverseLevelorder(const KeyNode& keyNode, const TreeChains& treeChains, co
         IsPrivateNPathRange isPrivateNPathRange = treeChains.at(level);
         bool isPrivate = isPrivateNPathRange.first;
         Range range = isPrivateNPathRange.second;
-        uint32_t min = range.first;
-        uint32_t max = range.second;
+        uint64_t min = range.first;
+        uint64_t max = range.second;
         
         level++;
-        for (uint32_t i = min; i <= max; ++i) {
-            uint32_t k = i;
+        for (uint64_t i = min; i <= max; ++i) {
+            uint32_t k = (uint32_t)i;
             if (isPrivate) k = KeyTreeUtil::toPrime(k);
             std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
             KeyNode childNode = keyNode.getChild(k);
@@ -512,8 +512,8 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
         treeChains.pop_front();
         bool isPrivate = isPrivateNPathRange.first;
         Range range = isPrivateNPathRange.second;
-        uint32_t min = range.first;
-        uint32_t max = range.second;
+        uint64_t min = range.first;
+        uint64_t max = range.second;
         bool isLeafNode = false;
         if (treeChains.empty()) isLeafNode = true;
         
@@ -521,8 +521,8 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
             visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
             traversePreorder(keyNode, treeChains, chainName, optionsDict);
         } else {
-            for (uint32_t i = min; i <= max; ++i) {
-                uint32_t k = i;
+            for (uint64_t i = min; i <= max; ++i) {
+                uint32_t k = (uint32_t)i;
                 if (isPrivate) k = KeyTreeUtil::toPrime(k);
                 std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);
@@ -541,8 +541,8 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
         treeChains.pop_front();
         bool isPrivate = isPrivateNPathRange.first;
         Range range = isPrivateNPathRange.second;
-        uint32_t min = range.first;
-        uint32_t max = range.second;
+        uint64_t min = range.first;
+        uint64_t max = range.second;
         bool isLeafNode = false;
         if (treeChains.empty()) isLeafNode = true;
         
@@ -550,8 +550,8 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
             traversePostorder(keyNode, treeChains, chainName, optionsDict);
             visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
         } else {
-            for (uint32_t i = min; i <= max; ++i) {
-                uint32_t k = i;
+            for (uint64_t i = min; i <= max; ++i) {
+                uint32_t k = (uint32_t)i;
                 if (isPrivate) k = KeyTreeUtil::toPrime(k);
                 std::string childChainName = chainName + "/" + KeyTreeUtil::iToString(k);
                 KeyNode childNode = keyNode.getChild(k);

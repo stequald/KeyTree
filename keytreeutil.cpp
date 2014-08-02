@@ -88,8 +88,6 @@ namespace KeyTreeUtil {
                     treeChains.push_back(range);
                 } else {
                     uint32_t num = toPrime(std::stoi(node));
-                    if (num == NODE_IDX_M)
-                        throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(num));
                     treeChains.push_back(IsPrivateNPathRange(true , Range(num, num)));
                 }
             } else {
@@ -98,8 +96,6 @@ namespace KeyTreeUtil {
                     treeChains.push_back(range);
                 } else {
                     uint32_t num = std::stoi(node);
-                    if (num == NODE_IDX_M)
-                        throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(num));
                     treeChains.push_back(IsPrivateNPathRange(false , Range(num, num)));
                 }
             }
@@ -118,10 +114,6 @@ namespace KeyTreeUtil {
         
         uint32_t min = std::stoi(minMaxPair[0]);
         uint32_t max = std::stoi(minMaxPair[1]);
-        if (min == NODE_IDX_M)
-            throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(min));
-        if (max == NODE_IDX_M)
-            throw std::invalid_argument("Invalid arguments. Invalid Range: " + std::to_string(max));
         
         if (isPrivate) {
             return IsPrivateNPathRange(true, Range(min, max));
