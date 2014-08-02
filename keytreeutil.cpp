@@ -27,6 +27,22 @@
 
 namespace KeyTreeUtil {
 
+    uchar_vector sha256Rounds(const uchar_vector& data, uint64_t rounds) {
+        unsigned char hash[SHA256_DIGEST_LENGTH];
+        SHA256_CTX sha256;
+        SHA256_Init(&sha256);
+        SHA256_Update(&sha256, &data[0], data.size());
+        SHA256_Final(hash, &sha256);
+        for (int i = 0; i < rounds - 1; i++) {
+            SHA256_Init(&sha256);
+            SHA256_Update(&sha256, hash, SHA256_DIGEST_LENGTH);
+            SHA256_Final(hash, &sha256);
+        }
+        
+        uchar_vector rval(hash, SHA256_DIGEST_LENGTH);
+        return rval;
+    }
+    
     uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey) {
         uchar_vector extendedKey;
         if (isBase58CheckValid(extKey))

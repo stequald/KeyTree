@@ -50,6 +50,7 @@ namespace KeyTreeUtil
     const std::string MASTER_NODE_LOWERCASE_M = "m";
     const std::string LEAD_CHAIN_PATH = "___";
     
+    uchar_vector sha256Rounds(const uchar_vector& data, uint64_t rounds);
     TreeChains parseChainString(const std::string& chainStr, bool isPrivate = true);
     std::string iToString(uint32_t i);
     uchar_vector extKeyBase58OrHexToBytes(const std::string& extKey);
