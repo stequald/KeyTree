@@ -46,7 +46,7 @@ namespace TreeTraversal {
 
 namespace KeyTreeUtil
 {
-    const uint64_t NODE_IDX_M = uint64_t(std::numeric_limits<int>::max())+1;
+    const uint64_t NODE_IDX_M = uint64_t(std::numeric_limits<uint64_t>::max());
     const std::string MASTER_NODE_LOWERCASE_M = "m";
     const std::string LEAD_CHAIN_PATH = "___";
     
