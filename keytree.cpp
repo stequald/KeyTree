@@ -518,7 +518,7 @@ void traversePreorder(const KeyNode& keyNode, TreeChains treeChains, const std::
         if (treeChains.empty()) isLeafNode = true;
         
         if (min == KeyTreeUtil::NODE_IDX_M_FLAG && max == KeyTreeUtil::NODE_IDX_M_FLAG) {
-            visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
+            visit(keyNode, chainName, isLeafNode, optionsDict);
             traversePreorder(keyNode, treeChains, chainName, optionsDict);
         } else {
             for (uint64_t i = min; i <= max; ++i) {
@@ -548,7 +548,7 @@ void traversePostorder(const KeyNode& keyNode, TreeChains treeChains, const std:
         
         if (min == KeyTreeUtil::NODE_IDX_M_FLAG && max == KeyTreeUtil::NODE_IDX_M_FLAG) {
             traversePostorder(keyNode, treeChains, chainName, optionsDict);
-            visit(keyNode, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, isLeafNode, optionsDict);
+            visit(keyNode, chainName, isLeafNode, optionsDict);
         } else {
             for (uint64_t i = min; i <= max; ++i) {
                 uint32_t k = (uint32_t)i;
