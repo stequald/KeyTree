@@ -74,7 +74,7 @@ namespace KeyTreeUtil {
             throw std::runtime_error("Invalid Chain string.");
         
         //account for root node
-        treeChains.push_back(IsPrivateNPathRange(true , Range(NODE_IDX_M, NODE_IDX_M)));
+        treeChains.push_back(IsPrivateNPathRange(true , Range(NODE_IDX_M_FLAG, NODE_IDX_M_FLAG)));
         
         if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
         splitChain.pop_front();
