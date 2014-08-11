@@ -40,9 +40,9 @@ using namespace std;
  Option to specify seed, extended key and chain in command line is possible,
  but is discouraged because on most OS commands are stored in a history file.
  To do it put the noprompt option at the begining.
- ./kt --noprompt -s "this is a password" --chain "m/(0-1)'/(6-8)'" -trav levelorder
- ./kt -np --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -c "m/(0-1)'/8"
-*/
+ ./kt --noprompt -s "this is a password" --chain "(0-1)'/(6-8)'" -trav levelorder
+ ./kt -np --extkey "xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7" -c "(0-1)'/8"
+ */
 
 static bool noInputEcho = false;
 static const std::string NO_INPUT_ECHO = "-noecho";
@@ -127,7 +127,7 @@ void testVector1() {
     OptionsDict optionsDict;
     optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
     optionsDict[VERBOSE_OPTION] = false;
-    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "m/0'/1/2'/2/1000000000", StringUtils::hex, 0, optionsDict);
+    outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "0'/1/2'/2/1000000000", StringUtils::hex, 0, optionsDict);
 }
 
 void testVector2() {
@@ -135,7 +135,7 @@ void testVector2() {
     optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
     optionsDict[VERBOSE_OPTION] = false;
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
-    outputExtKeysFromSeed(seed, "m/0/2147483647'/1/2147483646'/2", StringUtils::hex, 0, optionsDict);
+    outputExtKeysFromSeed(seed, "0/2147483647'/1/2147483646'/2", StringUtils::hex, 0, optionsDict);
 }
 
 template<typename It>
@@ -219,7 +219,7 @@ void outputExamples() {
     outputString("Enter Seed:");
     outputString("correct horse battery staple");
     outputString("Enter Chain:");
-    outputString("m/0'/0");
+    outputString("0'/0");
     outputString("");
     
     outputString("Use the hex option to enter the seed in hex:");
@@ -227,7 +227,7 @@ void outputExamples() {
     outputString("Enter Seed in Hex:");
     outputString("000102030405060708090a0b0c0d0e0f");
     outputString("Enter Chain:");
-    outputString("m/0'/0");
+    outputString("0'/0");
     outputString("");
     
     outputString("Use the extended key option to enter the extended key in lieu of the seed:");
@@ -240,7 +240,7 @@ void outputExamples() {
     outputString("Enter Extended Key:");
     outputString("xprv9uHRZZhk6KAJC1avXpDAp4MDc3sQKNxDiPvvkX8Br5ngLNv1TxvUxt4cV1rGL5hj6KCesnDYUhd7oWgT11eZG7XnxHrnYeSvkzY7d2bhkJ7");
     outputString("Enter Chain:");
-    outputString("m/0'/(3-6)'/(1-2)/8");
+    outputString("0'/(3-6)'/(1-2)/8");
     outputString("");
     
     outputString("To output all the node data on the chain, use the all option:");

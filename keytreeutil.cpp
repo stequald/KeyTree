@@ -70,14 +70,10 @@ namespace KeyTreeUtil {
         
         std::deque<std::string> splitChain = StringUtils::split(s, '/');
         
-        if (splitChain[0] != "m")
-            throw std::runtime_error("Invalid Chain string.");
-        
         //account for root node
         treeChains.push_back(IsPrivateNPathRange(true , Range(NODE_IDX_M_FLAG, NODE_IDX_M_FLAG)));
         
         if (splitChain.back() == "") splitChain.pop_back(); // happens if chainStr has '/' at end
-        splitChain.pop_front();
         for (std::string& node : splitChain) {
             if (node.back() == '\'') {
                 if (! isPrivate) throw std::runtime_error("Invalid chain "+ chainStr+ ",  not private extended key.");
