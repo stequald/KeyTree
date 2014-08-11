@@ -62,7 +62,7 @@ static const std::string EXTENDEDKEY_VALUE = "extkey_value";
 static const std::string CHAIN_VALUE = "chain_value";
 
 static const std::string SEED = "-seed";
-static const std::string SEED_HEX = "-seed.hex";
+static const std::string SEED_HEX = "-seedhex";
 static const std::string EXTENDEDKEY = "-extkey";
 static const std::string CHAIN = "-chain";
 static const std::string TREE_TRAVERSAL_OPTION = "-traverse";
@@ -73,10 +73,7 @@ static const std::string OUTPUT_ENTIRE_CHAIN_OPTION = "-all";
 static const std::string VERBOSE_OPTION = "-verbose";
 
 static const std::string SEED_SHORT = "s";
-static const std::string SEED_SHORT_HEX_SHORT = "s.h";
-static const std::string SEED_HEX_SHORT = "seed.h";
-static const std::string SEED_SHORT_HEX = "s.hex";
-
+static const std::string SEED_HEX_SHORT = "sh";
 static const std::string EXTENDEDKEY_SHORT = "ek";
 static const std::string CHAIN_SHORT = "c";
 static const std::string TREE_TRAVERSAL_OPTION_SHORT = "trav";
@@ -158,8 +155,7 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
                 ++it;
                 argsDict[SEED_VALUE] = *it;
             }
-        } else if (arg == SEED_HEX || arg == SEED_HEX_SHORT
-                   || arg == SEED_SHORT_HEX || arg == SEED_SHORT_HEX_SHORT) {
+        } else if (arg == SEED_HEX || arg == SEED_HEX_SHORT) {
             argsDict[SEED_FORMAT] = "hex";
             argsDict[SEED] = "Y";
             if (getOptionValue(argsDict[NO_PROMPT])) {
