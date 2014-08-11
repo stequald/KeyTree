@@ -35,14 +35,14 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
     Enter Seed:
     correct horse battery staple
     Enter Chain:
-    0'/0
+    0'/1/2
 
 ###### Use the hex option to enter the seed in hex:
-    ./kt --seed.hex 
+    ./kt --seedhex 
     Enter Seed in Hex:
-    000102030405060708090a0b0c0d0e0f
+    5e8fc96380121030d090dc2242c4c4159235cdb9fb027e2fa27cdcf0f7216129
     Enter Chain:
-    0'/0
+    0'/1/2
   
 ###### Use the extended key option to enter the extended key in lieu of the seed:
     ./kt --extkey 
@@ -61,7 +61,7 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
 
 ###### It is also possible to output the nodes in a different order:
     ./kt --traverse levelorder
-    ./kt -s.h -trav postorder
+    ./kt -sh -trav postorder
     ./kt -ek -trav preorder
 
 ###### For more information on nodes use the verbose option:
