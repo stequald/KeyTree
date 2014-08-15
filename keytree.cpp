@@ -293,53 +293,51 @@ std::string get_input(std::string pretext) {
 int enter_prompt(std::map<std::string, std::string> argsDict) {
     if (argsDict[HELP] == HELP) {
         outputExamples();
-    } else if (getOptionValue(argsDict[SEED])) {
-        std::string seed;
-        std::string chain;
-        
-        StringUtils::StringFormat seed_format;
-        if (argsDict[SEED_FORMAT] == "hex") {
-            seed_format = StringUtils::hex;
-            seed = get_input("Enter Seed in Hex:");
-            if (! StringUtils::isHex(seed))
-                throw std::runtime_error("Invalid hex string \"" + seed + "\"");
-        } else {
-            seed_format = StringUtils::ascii;
-            seed = get_input("Enter Seed:");
-        }
-        
-        chain = get_input("Enter Chain:");
-        
-        int roundsToHash = 0;
-        if (getOptionValue(argsDict[HASH_SEED])) {
-            std::string roundsToHashStr = get_input("Enter number of rounds of Sha256 hash:");
-            std::stringstream(roundsToHashStr) >> roundsToHash;
-        }
-        
+    } else {
         OptionsDict optionsDict;
         optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromSeed(seed, chain, seed_format, roundsToHash, optionsDict, traverseType);
         
-    } else if (getOptionValue(argsDict[EXTENDEDKEY])) {
-        std::string extkey;
-        std::string chain;
-        
-        extkey = get_input("Enter Extended Key:");
-        
-        chain = get_input("Enter Chain:");
-        
-        OptionsDict optionsDict;
-        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        if(! chain.empty())
-            outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
-        else
-            outputKeyAddressofExtKey(extkey, optionsDict);
+        if (getOptionValue(argsDict[SEED])) {
+            std::string seed;
+            std::string chain;
+            
+            StringUtils::StringFormat seed_format;
+            if (argsDict[SEED_FORMAT] == "hex") {
+                seed_format = StringUtils::hex;
+                seed = get_input("Enter Seed in Hex:");
+                if (! StringUtils::isHex(seed))
+                    throw std::runtime_error("Invalid hex string \"" + seed + "\"");
+            } else {
+                seed_format = StringUtils::ascii;
+                seed = get_input("Enter Seed:");
+            }
+            
+            chain = get_input("Enter Chain:");
+            
+            int roundsToHash = 0;
+            if (getOptionValue(argsDict[HASH_SEED])) {
+                std::string roundsToHashStr = get_input("Enter number of rounds of Sha256 hash:");
+                std::stringstream(roundsToHashStr) >> roundsToHash;
+            }
+            
+            outputExtKeysFromSeed(seed, chain, seed_format, roundsToHash, optionsDict, traverseType);
+            
+        } else if (getOptionValue(argsDict[EXTENDEDKEY])) {
+            std::string extkey;
+            std::string chain;
+            
+            extkey = get_input("Enter Extended Key:");
+            
+            chain = get_input("Enter Chain:");
+            
+            if(! chain.empty())
+                outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
+            else
+                outputKeyAddressofExtKey(extkey, optionsDict);
+        }
     }
     return 0;
 }
@@ -353,46 +351,40 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
     if (argsDict[HELP] == HELP) {
         outputExamples();
         return 0;
-    } else if (argsDict[SEED_VALUE] != "" && argsDict[CHAIN_VALUE] != "") {
-        std::string seed = argsDict[SEED_VALUE];
-        std::string chain = argsDict[CHAIN_VALUE];
-        
-        StringUtils::StringFormat seed_format;
-        if (argsDict[SEED_FORMAT] == "hex")
-            seed_format = StringUtils::hex;
-        else
-            seed_format = StringUtils::ascii;
-        
-        
-        std::string roundsToHashStr = argsDict[HASH_SEED];
-        int roundsToHash = 0;
-        std::stringstream(roundsToHashStr) >> roundsToHash;
-        
-        OptionsDict optionsDict;
-        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        optionsDict[HASH_SEED] = getOptionValue(argsDict[HASH_SEED]);
-        outputExtKeysFromSeed(seed, chain, seed_format, roundsToHash, optionsDict, traverseType);
-    } else if (argsDict[EXTENDEDKEY_VALUE] != "" && argsDict[CHAIN_VALUE] != "") {
-        std::string extkey = argsDict[EXTENDEDKEY_VALUE];
-        std::string chain = argsDict[CHAIN_VALUE];
-        
-        OptionsDict optionsDict;
-        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
-        outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
-    } else if (argsDict[EXTENDEDKEY] != "") {
-        std::string extkey = argsDict[EXTENDEDKEY_VALUE];
-        OptionsDict optionsDict;
-        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
-        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
-        outputKeyAddressofExtKey(extkey, optionsDict);
     } else {
-        throw std::invalid_argument("Invalid arguments.");
+        OptionsDict optionsDict;
+        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
+        optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
+        optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
+        
+        if (argsDict[SEED_VALUE] != "" && argsDict[CHAIN_VALUE] != "") {
+            std::string seed = argsDict[SEED_VALUE];
+            std::string chain = argsDict[CHAIN_VALUE];
+            
+            StringUtils::StringFormat seed_format;
+            if (argsDict[SEED_FORMAT] == "hex")
+                seed_format = StringUtils::hex;
+            else
+                seed_format = StringUtils::ascii;
+            
+            std::string roundsToHashStr = argsDict[HASH_SEED];
+            int roundsToHash = 0;
+            std::stringstream(roundsToHashStr) >> roundsToHash;
+            TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
+            optionsDict[HASH_SEED] = getOptionValue(argsDict[HASH_SEED]);
+            outputExtKeysFromSeed(seed, chain, seed_format, roundsToHash, optionsDict, traverseType);
+        } else if (argsDict[EXTENDEDKEY_VALUE] != "" && argsDict[CHAIN_VALUE] != "") {
+            std::string extkey = argsDict[EXTENDEDKEY_VALUE];
+            std::string chain = argsDict[CHAIN_VALUE];
+            
+            TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
+            outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
+        } else if (argsDict[EXTENDEDKEY] != "") {
+            std::string extkey = argsDict[EXTENDEDKEY_VALUE];
+            outputKeyAddressofExtKey(extkey, optionsDict);
+        } else {
+            throw std::invalid_argument("Invalid arguments.");
+        }
     }
     
     return 0;
@@ -595,6 +587,8 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
         } else {
             KeyNode::setTestNet(false);
         }
+    } else {
+        KeyNode::setTestNet(false);
     }
     
     KeyNodeSeed keyNodeSeed(seedBytes);
@@ -641,6 +635,8 @@ void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chain
         } else {
             KeyNode::setTestNet(false);
         }
+    } else {
+        KeyNode::setTestNet(false);
     }
     
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
@@ -661,10 +657,20 @@ void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chain
 }
 
 void outputKeyAddressofExtKey(const std::string& extKey, const OptionsDict& optionsDict) {
+    if (optionsDict.find(TESTNET) != optionsDict.end()) {
+        if (optionsDict.at(TESTNET) == true) {
+            KeyNode::setTestNet(true);
+        } else {
+            KeyNode::setTestNet(false);
+        }
+    } else {
+        KeyNode::setTestNet(false);
+    }
+    
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
-    visit(keyNode, KeyTreeUtil::LEAD_CHAIN_PATH, true, optionsDict);
     if (optionsDict.at(VERBOSE_OPTION)) outputExtraKeyNodeData(keyNode);
+    visit(keyNode, KeyTreeUtil::LEAD_CHAIN_PATH, true, optionsDict);
     outputString("");
 }
 
