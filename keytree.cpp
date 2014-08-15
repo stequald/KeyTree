@@ -357,15 +357,17 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         
-        if (argsDict[SEED_VALUE] != "" && argsDict[CHAIN_VALUE] != "") {
+        if (argsDict[SEED_VALUE] != "") {
             std::string seed = argsDict[SEED_VALUE];
-            std::string chain = argsDict[CHAIN_VALUE];
-            
             StringUtils::StringFormat seed_format;
             if (argsDict[SEED_FORMAT] == "hex")
                 seed_format = StringUtils::hex;
             else
                 seed_format = StringUtils::ascii;
+            
+            std::string chain = "";
+            if (argsDict[CHAIN_VALUE] != "")
+                chain = argsDict[CHAIN_VALUE];
             
             std::string roundsToHashStr = argsDict[HASH_SEED];
             int roundsToHash = 0;
