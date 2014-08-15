@@ -82,6 +82,14 @@ HDKeychain::HDKeychain(const bytes_t& extkey)
     chain_code_.assign(extkey.begin() + 13, extkey.begin() + 45);
     key_.assign(extkey.begin() + 45, extkey.begin() + 78);
     
+    if (isPrivate()) {
+        if (version_ != priv_version_)
+            throw std::runtime_error("Invalid extended key version.");
+    } else {
+        if (version_ != pub_version_)
+            throw std::runtime_error("Invalid extended key version.");
+    }
+    
     updatePubkey();
     
     valid_ = true;
