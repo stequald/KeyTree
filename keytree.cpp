@@ -386,7 +386,7 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
         outputExtKeysFromExtKey(extkey, chain, optionsDict, traverseType);
     } else if (argsDict[EXTENDEDKEY] != "") {
-        std::string extkey = argsDict[EXTENDEDKEY];
+        std::string extkey = argsDict[EXTENDEDKEY_VALUE];
         OptionsDict optionsDict;
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
