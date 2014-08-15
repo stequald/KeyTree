@@ -91,12 +91,12 @@ uchar_vector KeyNode::hash160(const uchar_vector& public_key) {
 
 std::string KeyNode::publicKeyToAddress(const uchar_vector& public_key) {
     uchar_vector h160 = KeyNode::hash160(public_key);
-    return KeyNode::hash160ToAddress(h160);
+    return KeyNode::hash160ToAddress(h160, address_prefix_);
 }
 
-std::string KeyNode::hash160ToAddress(const uchar_vector& h160, int addrtype) {
+std::string KeyNode::hash160ToAddress(const uchar_vector& h160, uint8_t addrtype) {
     uchar_vector vh160;
-    vh160.push_back((unsigned char)addrtype);
+    vh160.push_back(addrtype);
     vh160 += h160;
     return toBase58Check(vh160);
 }
@@ -107,14 +107,25 @@ std::string KeyNode::encodeBase58Check(const uchar_vector& vchIn) {
 
 std::string KeyNode::secretToASecret(const uchar_vector& secret, bool compressed) {
     uchar_vector vchIn;
-    vchIn.push_back('\x80');
+    vchIn.push_back(private_key_prefix_);
     vchIn += secret;
-    if (compressed) vchIn.push_back('\01');
+    if (compressed) vchIn.push_back(0x01); // add compressed flag
     
     return encodeBase58Check(vchIn);
 }
 
 void KeyNode::setTestNet(bool enabled) {
-    if (enabled) Coin::HDKeychain::setVersions(0x04358394, 0x043587CF);
-    else Coin::HDKeychain::setVersions(0x0488ADE4, 0x0488B21E);
+    if (enabled) {
+        Coin::HDKeychain::setVersions(0x04358394, 0x043587CF);
+        address_prefix_ = 0x6F;
+        private_key_prefix_ = 0xEF;
+    }
+    else {
+       Coin::HDKeychain::setVersions(0x0488ADE4, 0x0488B21E);
+        address_prefix_ = 0x00;
+        private_key_prefix_ = 0x80;
+    }
 }
+
+uint8_t KeyNode::address_prefix_ = 0x00;
+uint8_t KeyNode::private_key_prefix_ = 0x80;

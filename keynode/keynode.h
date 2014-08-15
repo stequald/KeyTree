@@ -53,8 +53,10 @@ private:
     static std::string secretToASecret(const uchar_vector& secret, bool compressed = false);
     static std::string publicKeyToAddress(const uchar_vector& public_key);
     static uchar_vector hash160(const uchar_vector& public_key);
-    static std::string hash160ToAddress(const uchar_vector& h160, int addrtype = 0);
+    static std::string hash160ToAddress(const uchar_vector& h160, uint8_t addrtype);
     static std::string encodeBase58Check(const uchar_vector& vchIn);
+    static uint8_t address_prefix_;
+    static uint8_t private_key_prefix_;
 };
 
 #endif /* KEYNODE_KEYNODE_H */

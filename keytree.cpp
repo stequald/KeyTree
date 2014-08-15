@@ -48,6 +48,9 @@ static bool noInputEcho = false;
 static const std::string NO_INPUT_ECHO = "-noecho";
 static const std::string NO_INPUT_ECHO_SHORT = "ne";
 
+static const std::string TESTNET = "-testnet";
+static const std::string TESTNET_SHORT = "tn";
+
 static const std::string HASH_SEED = "-hashseed";
 static const std::string HASH_SEED_SHORT = "hs";
 
@@ -124,6 +127,7 @@ void testVector1() {
     OptionsDict optionsDict;
     optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
     optionsDict[VERBOSE_OPTION] = false;
+    //optionsDict[VERBOSE_OPTION] = true;
     outputExtKeysFromSeed("000102030405060708090a0b0c0d0e0f", "0'/1/2'/2/1000000000", StringUtils::hex, 0, optionsDict);
 }
 
@@ -131,6 +135,7 @@ void testVector2() {
     OptionsDict optionsDict;
     optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = true;
     optionsDict[VERBOSE_OPTION] = false;
+    //optionsDict[VERBOSE_OPTION] = true;
     std::string seed = "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542";
     outputExtKeysFromSeed(seed, "0/2147483647'/1/2147483646'/2", StringUtils::hex, 0, optionsDict);
 }
@@ -184,6 +189,8 @@ std::map<std::string, std::string> parse_arguments(It begin, It end) {
             argsDict[VERBOSE_OPTION] = "Y";
         } else if(arg == NO_INPUT_ECHO || arg == NO_INPUT_ECHO_SHORT) {
             noInputEcho = true;
+        } else if(arg == TESTNET || arg == TESTNET_SHORT) {
+            argsDict[TESTNET] = "Y";
         } else if(arg == HASH_SEED || arg == HASH_SEED_SHORT) {
             argsDict[HASH_SEED] = "Y";
             
@@ -310,6 +317,7 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         }
         
         OptionsDict optionsDict;
+        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
@@ -324,6 +332,7 @@ int enter_prompt(std::map<std::string, std::string> argsDict) {
         chain = get_input("Enter Chain:");
         
         OptionsDict optionsDict;
+        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
@@ -354,12 +363,13 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         else
             seed_format = StringUtils::ascii;
         
-
+        
         std::string roundsToHashStr = argsDict[HASH_SEED];
         int roundsToHash = 0;
         std::stringstream(roundsToHashStr) >> roundsToHash;
-
+        
         OptionsDict optionsDict;
+        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
@@ -370,6 +380,7 @@ int handle_arguments(std::map<std::string, std::string> argsDict) {
         std::string chain = argsDict[CHAIN_VALUE];
         
         OptionsDict optionsDict;
+        optionsDict[TESTNET] = getOptionValue(argsDict[TESTNET]);
         optionsDict[OUTPUT_ENTIRE_CHAIN_OPTION] = getOptionValue(argsDict[OUTPUT_ENTIRE_CHAIN_OPTION]);
         optionsDict[VERBOSE_OPTION] = getOptionValue(argsDict[VERBOSE_OPTION]);
         TreeTraversal::Type traverseType = getTreeTraversalOption(argsDict[TREE_TRAVERSAL_OPTION]);
@@ -393,12 +404,10 @@ void outputString(const std::string& str) {
 
 int main(int argc, const char * argv[]) {
     Logger::setLogLevelError();
-    Logger::setLogLevelDebug();
-    //KeyNode::setTestNet(true);
-    
+    //Logger::setLogLevelDebug();
     //testVector1();
     //testVector2();
-    
+
     try {
         std::map<std::string, std::string> argsDict = parse_arguments(argv+1, argv+argc);
         if (getOptionValue(argsDict[NO_PROMPT])) {
@@ -580,6 +589,14 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
         seedBytes = uchar_vector(hash);
     }
     
+    if (optionsDict.find(TESTNET) != optionsDict.end()) {
+        if (optionsDict.at(TESTNET) == true) {
+            KeyNode::setTestNet(true);
+        } else {
+            KeyNode::setTestNet(false);
+        }
+    }
+    
     KeyNodeSeed keyNodeSeed(seedBytes);
     bytes_t k = keyNodeSeed.getMasterKey();
     bytes_t c = keyNodeSeed.getMasterChainCode();
@@ -618,6 +635,14 @@ void outputExtraKeyNodeData(const KeyNode& keyNode) {
 
 void outputExtKeysFromExtKey(const std::string& extKey, const std::string& chainStr,
                              const OptionsDict& optionsDict, TreeTraversal::Type traversalType) {
+    if (optionsDict.find(TESTNET) != optionsDict.end()) {
+        if (optionsDict.at(TESTNET) == true) {
+            KeyNode::setTestNet(true);
+        } else {
+            KeyNode::setTestNet(false);
+        }
+    }
+    
     uchar_vector extendedKey(KeyTreeUtil::extKeyBase58OrHexToBytes(extKey));
     KeyNode keyNode(extendedKey);
     TreeChains treeChains = KeyTreeUtil::parseChainString(chainStr, keyNode.isPrivate());
