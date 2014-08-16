@@ -28,7 +28,7 @@ There are other tools that have HDWallet implementations, but their purposes are
 
 #### How to use:
 
-Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples below.
+The input seed is coverted to hex before it used as the master seed, or you can also use the --seedhex option to enter the seed in hex directly. Extended Keys can be in hex or base58. Examples below.
 
 ###### To use KeyTree simply do the following:
     ./kt
@@ -40,7 +40,7 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
 ###### Use the hex option to enter the seed in hex:
     ./kt --seedhex 
     Enter Seed in Hex:
-    bfe6ee6af1d8dc0dedbb64fb257cfd3b24a5b2245d65fdc9fe74aa85eeba5482
+    7b1f95ed9a1c9319172c2dd4cc765fb82bad1a3be1cfc89fc37006c0dbbcbe3d
     Enter Chain:
     0'/1/2
   
