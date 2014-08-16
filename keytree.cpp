@@ -609,7 +609,9 @@ void outputExtKeysFromSeed(const std::string& seed, const std::string& chainStr,
     bytes_t c = keyNodeSeed.getMasterChainCode();
     KeyNode prv(k, c);
     TreeChains treeChains = KeyTreeUtil::parseChainString(chainStr, prv.isPrivate());
-    outputString("Master (hex): " + seedBytes.getHex());
+    
+    if (optionsDict.at(VERBOSE_OPTION))
+        outputString("Master (hex): " + seedBytes.getHex());
     
     if (traversalType == TreeTraversal::postorder)
         traversePostorder(prv, treeChains, KeyTreeUtil::MASTER_NODE_LOWERCASE_M, optionsDict);
