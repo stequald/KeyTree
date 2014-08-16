@@ -45,18 +45,6 @@ using namespace std;
  */
 
 static bool noInputEcho = false;
-static const std::string NO_INPUT_ECHO = "-noecho";
-static const std::string NO_INPUT_ECHO_SHORT = "ne";
-
-static const std::string TESTNET = "-testnet";
-static const std::string TESTNET_SHORT = "tn";
-
-static const std::string HASH_SEED = "-hashseed";
-static const std::string HASH_SEED_SHORT = "hs";
-
-static const std::string NO_PROMPT = "-noprompt";
-static const std::string NO_PROMPT_SHORT = "np";
-
 static const std::string cmdName = "./kt";
 static const std::string HELP = "-help";
 static const std::string SEED_FORMAT = "seed_format";
@@ -64,6 +52,10 @@ static const std::string SEED_VALUE = "seed_value";
 static const std::string EXTENDEDKEY_VALUE = "extkey_value";
 static const std::string CHAIN_VALUE = "chain_value";
 
+static const std::string NO_INPUT_ECHO = "-noecho";
+static const std::string TESTNET = "-testnet";
+static const std::string HASH_SEED = "-hashseed";
+static const std::string NO_PROMPT = "-noprompt";
 static const std::string SEED = "-seed";
 static const std::string SEED_HEX = "-seedhex";
 static const std::string EXTENDEDKEY = "-extkey";
@@ -75,6 +67,10 @@ static const std::string TREE_TRAVERSAL_TYPE_LEVELORDER = "levelorder";
 static const std::string OUTPUT_ENTIRE_CHAIN_OPTION = "-all";
 static const std::string VERBOSE_OPTION = "-verbose";
 
+static const std::string NO_INPUT_ECHO_SHORT = "ne";
+static const std::string TESTNET_SHORT = "tn";
+static const std::string HASH_SEED_SHORT = "hs";
+static const std::string NO_PROMPT_SHORT = "np";
 static const std::string SEED_SHORT = "s";
 static const std::string SEED_HEX_SHORT = "sh";
 static const std::string EXTENDEDKEY_SHORT = "ek";
@@ -230,7 +226,7 @@ void outputExamples() {
     outputString("Enter Seed in Hex:");
     outputString("000102030405060708090a0b0c0d0e0f");
     outputString("Enter Chain:");
-    outputString("0'/0");
+    outputString("0'/1/2");
     outputString("");
     
     outputString("Use the extended key option to enter the extended key in lieu of the seed:");
@@ -260,6 +256,21 @@ void outputExamples() {
     outputString("For more information on the node use the verbose option:");
     outputString(cmdName+" --verbose");
     outputString(cmdName+" -v");
+
+    outputString("There is also the testnet option:");
+    outputString(cmdName+" --testnet");
+    outputString(cmdName+" -tn");
+    outputString("");
+    
+    outputString("Use the no echo option to not echo your inputs:");
+    outputString(cmdName+" --noecho");
+    outputString(cmdName+" -ne");
+    outputString("");
+    
+    outputString("Use the hash seed option to do a number of specific rounds of sha256 on your seed:");
+    outputString(cmdName+" --hashseed 10");
+    outputString(cmdName+" -hs 5");
+    outputString("");
 }
 
 TreeTraversal::Type getTreeTraversalOption(std::string treeTraversalOption) {

@@ -40,7 +40,7 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
 ###### Use the hex option to enter the seed in hex:
     ./kt --seedhex 
     Enter Seed in Hex:
-    ddd12befb8df29fb082213ddb7c0f335b95950f9a8dd263ffd21d82bad59a990
+    bfe6ee6af1d8dc0dedbb64fb257cfd3b24a5b2245d65fdc9fe74aa85eeba5482
     Enter Chain:
     0'/1/2
   
@@ -67,6 +67,14 @@ Extended Keys can be in hex or base58. Seed can be in ASCII or hex. Examples bel
 ###### For more information on each node use the verbose option:
     ./kt --verbose
     ./kt -v
+
+###### There is also the testnet option:
+    ./kt --testnet
+    ./kt -tn
+
+###### Use the no echo option to not echo your inputs:
+    ./kt --noecho
+    ./kt -ne
 
 ##### For more information on how to use KeyTree do:
     $./kt --help
